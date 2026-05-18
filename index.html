@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg-base:#030508;
+  --bg-surface:rgba(255,255,255,0.045);
+  --bg-surface-hover:rgba(255,255,255,0.08);
+  --bg-panel:rgba(8,9,12,0.88);
+  /* ── Travel brand colours ── */
+  --gold:#c9a84c;--gold2:#e8c97a;
+  --gold-dim:rgba(201,168,76,0.14);
+  --gold-glow:rgba(201,168,76,0.2);
+  --gold-border:rgba(201,168,76,0.26);
+  /* ── Game colours ── */
+  --quest:#e8523a;--quest-dim:rgba(232,82,58,0.14);
+  --local:#3dcb7f;--local-dim:rgba(61,203,127,0.13);
+  --blue:#4A9EFF;--blue-dim:rgba(74,158,255,0.14);
+  --green:#00E676;--green-dim:rgba(0,230,118,0.13);
+  --orange:#FF9142;--orange-dim:rgba(255,145,66,0.13);
+  --red:#FF4A4A;--red-dim:rgba(255,74,74,0.13);
+  --gal1:#8b6914;--gal2:#c4982a;
+  --gem1:#4285f4;--gem2:#9b72cb;--gem3:#d96570;
+  /* ── Text ── */
+  --txt1:#f0ede8;--txt2:#9a9288;--txt3:#52504d;
+  /* ── Borders ── */
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  /* ── Geometry ── */
+  --r:20px;--rs:12px;
+  --tab-h:110px;
+  --glass-blur:blur(24px);
+}
+html,body{height:100%;background:var(--bg-base);font-family:'Outfit','Pretendard',sans-serif;overflow:hidden;letter-spacing:-0.01em}
+.phone{
+  width:100%;height:100vh;
+  background:var(--bg-base);
+  background-image:
+    radial-gradient(circle at 15% 30%,rgba(201,168,76,0.06),transparent 45%),
+    radial-gradient(circle at 85% 70%,rgba(74,158,255,0.04),transparent 40%),
+    radial-gradient(circle at 50% 100%,rgba(232,82,58,0.03),transparent 40%);
+  overflow:hidden;position:relative;display:flex;flex-direction:column;
+}
+::-webkit-scrollbar{display:none}
+*{scrollbar-width:none}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 22px 16px;flex-shrink:0;z-index:35;background:linear-gradient(to bottom,var(--bg-base) 55%,transparent)}
+.hdr-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--txt1);cursor:pointer;letter-spacing:-.02em}
+.hdr-logo em{color:var(--gold);font-style:normal}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-score{background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:24px;padding:6px 14px;display:flex;align-items:center;gap:5px;box-shadow:0 6px 24px var(--gold-glow)}
+.hdr-score-val{font-size:14px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.hdr-score-lbl{font-size:11px;font-weight:600;color:rgba(201,168,76,0.65)}
+.hdr-btn{background:var(--bg-surface);border:1px solid var(--border);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;position:relative}
+.hdr-btn:active{background:var(--bg-surface-hover)}
+.hdr-btn svg{width:18px;height:18px;stroke:var(--txt1);fill:none;stroke-width:2;stroke-linecap:round}
+.notif{position:absolute;top:1px;right:1px;width:8px;height:8px;border-radius:50%;background:var(--quest);box-shadow:0 0 6px var(--quest);border:1.5px solid var(--bg-base)}
+
+/* ── CONTENT & VIEWS ── */
+.content{flex:1;position:relative;overflow:hidden;min-height:0}
+.view{display:none;flex-direction:column;height:100%;overflow-y:auto;padding-bottom:var(--tab-h)}
+.view.active{display:flex;animation:fadeUp .38s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── FLOATING ISLAND TABBAR (PlaySpot style) ── */
+.tabbar{
+  position:absolute;bottom:28px;left:22px;right:22px;
+  height:68px;display:flex;align-items:center;justify-content:space-between;
+  background:rgba(16,14,12,0.82);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid rgba(255,255,255,0.1);border-radius:34px;
+  padding:0 14px;z-index:35;
+  box-shadow:0 20px 44px rgba(0,0,0,.55),inset 0 1px 1px rgba(255,255,255,.08);
+  display:none;
+}
+.tabbar.show{display:flex}
+.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;padding:8px 0;color:var(--txt3);transition:.3s cubic-bezier(0.16,1,0.3,1);position:relative}
+.tab-btn.active{color:var(--gold);transform:translateY(-2px)}
+.tab-btn::after{content:'';position:absolute;bottom:-2px;width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;transition:.3s;box-shadow:0 0 6px var(--gold)}
+.tab-btn.active::after{opacity:1;bottom:2px}
+.tab-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:.3s}
+.tab-label{font-size:10px;font-weight:600;letter-spacing:.02em}
+
+/* ── OVERLAY DIMMER ── */
+.overlay{position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:55;display:none;backdrop-filter:blur(8px)}
+.overlay.show{display:block;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── BOTTOM SHEETS ── */
+.sheet{position:absolute;bottom:0;left:0;right:0;z-index:58;background:var(--bg-base);border-radius:32px 32px 0 0;border-top:1px solid var(--border2);display:none;flex-direction:column;max-height:88%;overflow:hidden}
+.sheet.show{display:flex;animation:sheetUp .38s cubic-bezier(0.16,1,0.3,1)}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.sheet-handle{padding:11px 0 4px;display:flex;justify-content:center;flex-shrink:0}
+.sheet-handle-bar{width:40px;height:5px;background:var(--txt3);border-radius:3px}
+.sheet-scroll{overflow-y:auto;flex:1;padding:0 20px 36px}
+
+/* ── PAYWALL (PlaySpot style, Travel colours) ── */
+.paywall{position:absolute;inset:0;z-index:65;background:rgba(0,0,0,.82);backdrop-filter:var(--glass-blur);display:none;align-items:flex-end}
+.paywall.show{display:flex;animation:fadeIn .3s ease}
+.pw-sheet{width:100%;background:var(--bg-base);border-radius:32px 32px 0 0;padding:30px 22px 40px;position:relative;border-top:1px solid var(--border2)}
+.pw-close{position:absolute;top:16px;right:20px;background:var(--bg-surface);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--txt2)}
+.pw-close svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.pw-emoji{font-size:44px;display:block;text-align:center;margin-bottom:14px}
+.pw-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--txt1);text-align:center;margin-bottom:8px}
+.pw-sub{font-size:14px;color:var(--txt2);text-align:center;line-height:1.6;margin-bottom:16px}
+.pw-social{font-size:12px;color:var(--txt1);text-align:center;margin-bottom:18px;padding:11px;background:var(--bg-surface);border-radius:14px;border:1px solid var(--border)}
+.pw-plans{display:flex;gap:10px;margin-bottom:22px}
+.pw-plan{flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;padding:16px 10px;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.pw-plan.sel{border-color:var(--gold);background:var(--gold-dim);box-shadow:0 0 0 1px var(--gold-border)}
+.pw-plan.pop::before{content:'추천';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:#000;font-size:10px;font-weight:700;letter-spacing:.04em;padding:4px 10px;border-radius:12px}
+.pw-plan-price{font-size:22px;font-weight:800;color:var(--txt1);margin-bottom:4px}
+.pw-plan-period{font-size:11px;font-weight:600;color:var(--txt3)}
+.pw-plan-label{font-size:12px;font-weight:700;color:var(--txt2);margin-top:5px}
+.pw-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:22px}
+.pw-feat{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--txt2)}
+.pw-feat svg{width:16px;height:16px;stroke:var(--local);fill:none;stroke-width:2.5;flex-shrink:0}
+.pw-fine{font-size:11px;color:var(--txt3);text-align:center;margin-top:11px}
+.btn-primary{width:100%;background:var(--gold);border:none;border-radius:var(--rs);padding:14px;font-size:15px;font-weight:700;color:#000;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 6px 20px var(--gold-glow);letter-spacing:-.01em}
+.btn-primary:active{opacity:.82;transform:scale(.98)}
+.btn-sec{width:100%;background:transparent;border:1px solid var(--border2);border-radius:var(--rs);padding:13px;font-size:14px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.2s;letter-spacing:-.01em}
+.btn-sec:active{background:var(--bg-surface)}
+
+/* ── AR OVERLAY (PlaySpot style) ── */
+.ar-overlay{position:absolute;inset:0;z-index:60;display:none;flex-direction:column;background:#000}
+.ar-overlay.show{display:flex;animation:fadeIn .3s ease}
+.ar-cam-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.5) saturate(.65)}
+.ar-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:40px 40px}
+.ar-top{position:relative;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:48px 22px 10px}
+.ar-badge{background:rgba(8,9,12,.75);border:1px solid var(--gold-border);border-radius:24px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:8px;backdrop-filter:var(--glass-blur)}
+.ar-live{width:8px;height:8px;border-radius:50%;background:var(--red);animation:liveBlink 1s infinite}
+@keyframes liveBlink{0%,100%{opacity:1}50%{opacity:.2}}
+.ar-x{background:rgba(8,9,12,.75);border:1px solid var(--border2);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--txt1);backdrop-filter:var(--glass-blur)}
+.ar-x svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.ar-finder{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);width:260px;height:260px;z-index:5}
+.arc{position:absolute;width:32px;height:32px;border-style:solid;border-color:var(--gold)}
+.arc.tl{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0}
+.arc.tr{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0}
+.arc.bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px}
+.arc.br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0}
+.ar-sweep{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 12px 2px var(--gold-glow);animation:sweepMove 1.6s ease-in-out infinite}
+@keyframes sweepMove{0%{top:0}100%{top:calc(100% - 2px)}}
+.ar-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,120px);z-index:5;text-align:center}
+.ar-hint-pill{background:rgba(8,9,12,.85);border-radius:24px;padding:9px 20px;font-size:12px;font-weight:600;color:var(--gold);letter-spacing:.05em;backdrop-filter:var(--glass-blur);display:inline-block}
+.ar-obj{position:absolute;top:50%;left:50%;transform:translate(-50%,-80%);z-index:6;text-align:center;display:none}
+.ar-obj.show{display:block;animation:objPop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes objPop{from{opacity:0;transform:translate(-50%,-80%) scale(.6)}to{opacity:1;transform:translate(-50%,-80%) scale(1)}}
+.ar-obj-lbl{background:rgba(8,9,12,.9);border:1px solid var(--gold-border);border-radius:16px;padding:10px 20px;display:inline-block;margin-bottom:14px;backdrop-filter:var(--glass-blur)}
+.ar-obj-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--txt1);margin-bottom:2px}
+.ar-obj-era{font-size:11px;font-weight:600;color:var(--gold)}
+.ar-obj-emoji{font-size:76px;filter:drop-shadow(0 0 36px rgba(232,82,58,.7));animation:objFloat 2s ease-in-out infinite}
+@keyframes objFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.ar-result{position:absolute;bottom:0;left:0;right:0;z-index:7;background:linear-gradient(transparent,rgba(3,5,8,.96) 20%);padding:28px 20px 38px;display:none}
+.ar-result.show{display:block;animation:sheetUp .4s cubic-bezier(0.16,1,0.3,1)}
+.ar-card{background:rgba(8,9,12,.93);border:1px solid var(--border2);border-radius:24px;padding:20px;backdrop-filter:var(--glass-blur)}
+.ar-card-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.ar-card-ico{width:52px;height:52px;border-radius:var(--rs);background:var(--quest-dim);border:1px solid rgba(232,82,58,.22);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ar-card-type{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--quest);margin-bottom:4px}
+.ar-card-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--txt1);line-height:1.25}
+.ar-card-desc{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:20px}
+
+/* ── QUEST OVERLAY (PlaySpot style) ── */
+.quest-overlay{position:absolute;inset:0;z-index:62;background:var(--bg-base);display:none;flex-direction:column;overflow-y:auto}
+.quest-overlay.show{display:flex;animation:fadeIn .3s ease}
+.q-hero{position:relative;height:200px;flex-shrink:0;overflow:hidden}
+.q-hero img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.7)}
+.q-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--bg-base) 0%,transparent 100%)}
+.q-hero-back{position:absolute;top:48px;left:20px;width:40px;height:40px;background:rgba(0,0,0,.65);border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:var(--glass-blur)}
+.q-hero-back svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.5}
+.q-hero-info{position:absolute;bottom:0;left:0;right:0;padding:20px 22px}
+.q-hero-loc{font-size:11px;font-weight:600;color:var(--txt3);margin-bottom:5px;letter-spacing:.05em}
+.q-hero-name{font-family:'Playfair Display',serif;font-size:24px;color:#fff;line-height:1.2}
+.q-body{padding:22px;flex:1;display:flex;flex-direction:column;gap:16px;padding-bottom:36px}
+.q-prog{display:flex;gap:6px}
+.q-dot{flex:1;height:4px;border-radius:2px;background:var(--border2)}
+.q-dot.done{background:var(--green)}.q-dot.now{background:var(--gold)}
+.q-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:24px;padding:24px;flex:1;display:flex;flex-direction:column}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.q-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:6px}
+.q-tag.quiz{background:var(--quest-dim);color:var(--quest)}
+.q-tag.action{background:var(--blue-dim);color:var(--blue)}
+.q-tag.scan{background:var(--gold-dim);color:var(--gold)}
+.q-pts{font-size:24px;font-weight:800;color:var(--gold)}
+.q-question{font-size:18px;font-weight:600;color:var(--txt1);line-height:1.55;margin-bottom:22px}
+.q-opts{display:flex;flex-direction:column;gap:12px}
+.q-opt{background:var(--bg-surface-hover);border:1px solid var(--border2);border-radius:16px;padding:16px 20px;color:var(--txt1);font-size:15px;text-align:left;font-weight:500;cursor:pointer;transition:.2s;letter-spacing:-.01em}
+.q-opt:active{transform:scale(.98)}
+.q-opt.ok{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.q-opt.no{background:var(--red-dim);border-color:var(--red);color:var(--red);animation:shake .22s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.q-success{text-align:center;padding:10px 0;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center}
+.q-success-emoji{font-size:64px;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.q-success-pts{font-size:48px;font-weight:800;color:var(--gold);margin:12px 0 4px}
+.q-success-sub{font-size:14px;color:var(--txt2);margin-bottom:20px}
+.q-reward-pill{background:var(--green-dim);border:1px solid var(--green);border-radius:16px;padding:14px 20px;font-size:14px;font-weight:600;color:var(--green);text-align:center;width:100%;margin-bottom:14px}
+.q-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.q-btn{background:var(--bg-surface);border:1px solid var(--border2);border-radius:var(--rs);padding:13px;font-size:13px;font-weight:600;color:var(--txt1);cursor:pointer;text-transform:uppercase;letter-spacing:.04em}
+
+/* Action quest */
+.action-ring{position:relative;width:144px;height:144px;margin:0 auto 16px;border-radius:50%;border:2px dashed var(--border2)}
+.action-btn{position:absolute;inset:8px;border-radius:50%;background:var(--blue-dim);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;transition:transform .08s}
+.action-btn:active{transform:scale(.9)}
+.action-bar-wrap{height:5px;background:var(--bg-surface-hover);border-radius:3px;overflow:hidden;margin-top:6px}
+.action-bar{height:100%;background:linear-gradient(90deg,var(--blue),rgba(74,158,255,.4));border-radius:3px;transition:width .08s;width:0%}
+
+/* Museum scan */
+.museum-scan-frame{border:2px solid var(--gold-border);border-radius:16px;height:160px;overflow:hidden;position:relative;margin-bottom:12px;cursor:pointer}
+.museum-scan-img{width:100%;height:100%;object-fit:cover;filter:brightness(.45) saturate(.6)}
+.museum-scan-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.mc .c{position:absolute;width:20px;height:20px;border-style:solid;border-color:var(--gold)}
+.mc .c.tl{top:10px;left:10px;border-width:2px 0 0 2px;border-radius:3px 0 0 0}
+.mc .c.tr{top:10px;right:10px;border-width:2px 2px 0 0;border-radius:0 3px 0 0}
+.mc .c.bl{bottom:10px;left:10px;border-width:0 0 2px 2px;border-radius:0 0 0 3px}
+.mc .c.br{bottom:10px;right:10px;border-width:0 2px 2px 0;border-radius:0 0 3px 0}
+.museum-sweep{position:absolute;left:10px;right:10px;height:2px;background:var(--gold);box-shadow:0 0 12px 3px var(--gold-glow);animation:galSweep 1.8s ease-in-out infinite}
+@keyframes galSweep{0%{top:10px}50%{top:calc(100% - 12px)}100%{top:10px}}
+.museum-scan-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:.08em}
+
+/* ── SIDE MENU (PlaySpot style) ── */
+.side-menu{position:absolute;inset:0;background:var(--bg-base);z-index:65;transform:translateX(-100%);transition:transform .38s cubic-bezier(0.16,1,0.3,1);display:flex;flex-direction:column}
+.side-menu.open{transform:translateX(0)}
+.sm-hdr{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;border-bottom:1px solid var(--border2)}
+.sm-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--txt1)}
+.sm-logo em{color:var(--gold);font-style:normal}
+.sm-close{background:var(--bg-surface);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--txt2)}
+.sm-close svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.sm-body{padding:22px;flex:1;overflow-y:auto}
+.sm-section{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:14px;margin-top:28px}
+.sm-section:first-child{margin-top:0}
+.sm-item{display:flex;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:.2s}
+.sm-item:active{opacity:.6}
+.sm-item-icon{width:44px;height:44px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.sm-item-name{font-size:15px;font-weight:600;color:var(--txt1);margin-bottom:2px}
+.sm-item-sub{font-size:12px;color:var(--txt3)}
+.sm-lang-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.sm-lang-pill{background:var(--bg-surface);border:1px solid var(--border2);border-radius:24px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:7px}
+.sm-lang-pill.sel{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+
+/* ── HOME ── */
+#view-home{padding:0}
+.home-hero{position:relative;height:220px;flex-shrink:0;overflow:hidden;margin:0 20px;border-radius:28px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.home-hero-bg{position:absolute;inset:0;background:url('https://picsum.photos/id/1018/800/500') center/cover;filter:brightness(.55) saturate(.9);transition:transform 3s ease-out}
+.home-hero:hover .home-hero-bg{transform:scale(1.04)}
+.home-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,8,.96) 0%,rgba(3,5,8,0) 100%)}
+.home-hero-content{position:absolute;bottom:0;left:0;right:0;padding:20px}
+.home-hero-eye{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px}
+.home-hero-eye::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);animation:goldPulse 2s infinite}
+@keyframes goldPulse{0%,100%{opacity:1}50%{opacity:.45}}
+.home-hero-title{font-family:'Playfair Display',serif;font-size:26px;color:#fff;line-height:1.25;margin-bottom:5px}
+.home-hero-sub{font-size:13px;color:rgba(255,255,255,.55);font-weight:500}
+.home-stats{display:flex;gap:10px;padding:18px 20px 0;flex-shrink:0}
+.hstat{flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--rs);padding:14px 8px;text-align:center}
+.hstat-val{font-size:18px;font-weight:700;color:var(--txt1);margin-bottom:2px}
+.hstat-lbl{font-size:10px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.home-body{padding:20px;display:flex;flex-direction:column;gap:20px}
+
+/* Pass Banner (PlaySpot style) */
+.pass-banner{background:linear-gradient(135deg,var(--gold-dim) 0%,rgba(77,156,255,.05) 100%);border:1px solid var(--gold-border);border-radius:28px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:.3s}
+.pass-banner:active{transform:scale(.98)}
+.pass-banner::after{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:radial-gradient(circle,rgba(201,168,76,.18),transparent 70%);border-radius:50%}
+.pb-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
+.pb-badge{font-size:10px;font-weight:700;background:var(--gold);color:#000;padding:4px 10px;border-radius:20px;box-shadow:0 4px 12px var(--gold-glow)}
+.pb-price{font-size:24px;font-weight:800;color:var(--txt1);line-height:1}
+.pb-price-sub{font-size:11px;font-weight:500;color:var(--txt2);margin-top:3px;text-align:right}
+.pb-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--txt1);margin-bottom:5px}
+.pb-desc{font-size:13px;color:var(--txt2);line-height:1.5;margin-bottom:14px}
+.pb-feats{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.pb-feat{background:var(--gold-dim);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:rgba(201,168,76,.8)}
+
+/* How-to strip */
+.how-strip{background:var(--bg-surface);border:1px solid var(--border);border-radius:28px;padding:20px}
+.how-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:16px}
+.how-steps{display:flex;flex-direction:column;gap:14px}
+.how-step{display:flex;align-items:flex-start;gap:12px}
+.how-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;background:var(--gold);flex-shrink:0;margin-top:2px}
+.how-text-title{font-size:14px;font-weight:600;color:var(--txt1);margin-bottom:2px}
+.how-text-sub{font-size:12px;color:var(--txt2);line-height:1.5}
+
+.sec-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:-2px}
+.sec-title{font-size:16px;font-weight:700;color:var(--txt1)}
+.sec-link{font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer}
+
+/* City scroll cards */
+.city-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.city-card{flex-shrink:0;width:140px;border-radius:20px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:.2s;position:relative}
+.city-card:active{transform:scale(.96);border-color:var(--gold-border)}
+.city-card.on{border-color:var(--gold-border);box-shadow:0 0 0 1px var(--gold-border)}
+.city-card-img{width:100%;height:84px;object-fit:cover;filter:brightness(.6) saturate(.8)}
+.city-card-body{background:var(--bg-panel);padding:9px 10px}
+.city-card-name{font-size:13px;font-weight:700;color:var(--txt1);margin-bottom:2px}
+.city-card-meta{font-size:10px;color:var(--txt3);font-weight:500}
+.city-price{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);border:1px solid var(--gold-border);border-radius:8px;padding:3px 8px;font-family:'DM Mono',monospace;font-size:10px;font-weight:600;color:var(--gold)}
+
+/* Spot cards (scard — PlaySpot style) */
+.spot-list{display:flex;flex-direction:column;gap:12px}
+.scard{background:var(--bg-surface);border:1px solid var(--border);border-radius:24px;padding:12px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:.3s}
+.scard:active{transform:scale(.97);background:var(--bg-surface-hover);border-color:var(--border2)}
+.scard-img{width:88px;height:88px;border-radius:var(--rs);object-fit:cover;flex-shrink:0}
+.scard-body{flex:1;min-width:0}
+.scard-type{font-size:10px;font-weight:700;padding:4px 8px;border-radius:6px;display:inline-block;margin-bottom:6px}
+.scard-type.audio{background:linear-gradient(90deg,var(--gem1),var(--gem2));color:#fff}
+.scard-type.quest{background:var(--quest-dim);color:var(--quest)}
+.scard-type.local{background:var(--local-dim);color:var(--local)}
+.scard-type.museum{background:var(--gold-dim);color:var(--gold)}
+.scard-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--txt1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scard-sub{font-size:12px;color:var(--txt2);font-weight:500}
+.scard-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:9px}
+.scard-pts{font-size:13px;font-weight:700}
+.scard-pts.audio{color:var(--gem2)}.scard-pts.quest{color:var(--quest)}.scard-pts.local{color:var(--local)}.scard-pts.museum{color:var(--gold)}
+.trigger-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:4px 8px;border-radius:8px}
+.t-gps{background:var(--blue-dim);color:var(--blue)}.t-cam{background:var(--gold-dim);color:var(--gold)}.t-free{background:var(--local-dim);color:var(--local)}
+.lock-badge{font-size:14px;opacity:.5}
+
+/* ── MAP VIEW ── */
+#view-map{padding:0;overflow:hidden}
+.map-wrap{position:absolute;inset:0}
+.map-sim{position:absolute;inset:0;background:radial-gradient(ellipse at 40% 45%,rgba(30,28,22,.8),var(--bg-base) 70%)}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px}
+.map-road{position:absolute;background:rgba(255,255,255,.055)}
+.map-area-lbl{position:absolute;font-size:10px;font-weight:700;color:rgba(255,255,255,.18);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.map-user{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--blue);box-shadow:0 0 0 6px rgba(74,158,255,.2);z-index:10}
+.map-user::after{content:'';position:absolute;inset:-8px;border-radius:50%;background:rgba(74,158,255,.15);animation:uPing 2s ease-out infinite}
+@keyframes uPing{0%{transform:scale(.7);opacity:.8}100%{transform:scale(2.5);opacity:0}}
+.map-pin{position:absolute;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2.5px solid;cursor:pointer;transition:transform .18s;position:absolute;z-index:10}
+.map-pin::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:1.5px solid;opacity:.2}
+.map-pin:active{transform:translate(-50%,-50%) scale(.88)}
+.map-pin.audio{background:var(--blue-dim);border-color:var(--blue);box-shadow:0 4px 18px rgba(74,158,255,.2)}.map-pin.audio::after{border-color:var(--blue)}
+.map-pin.quest{background:var(--quest-dim);border-color:var(--quest);box-shadow:0 4px 18px rgba(232,82,58,.22)}.map-pin.quest::after{border-color:var(--quest)}
+.map-pin.local{background:var(--local-dim);border-color:var(--local)}.map-pin.local::after{border-color:var(--local)}
+.map-pin.museum{background:var(--gold-dim);border-color:var(--gold);box-shadow:0 4px 18px var(--gold-glow)}.map-pin.museum::after{border-color:var(--gold)}
+.map-pin.near{animation:mkGlow 1.4s ease-in-out infinite}
+@keyframes mkGlow{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 10px transparent}}
+.map-top{position:absolute;top:10px;left:14px;right:14px;z-index:20;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.map-search{display:flex;align-items:center;gap:12px;background:rgba(8,9,12,.88);border:1px solid var(--border2);border-radius:30px;padding:14px 18px;backdrop-filter:var(--glass-blur);pointer-events:all}
+.map-search svg{width:16px;height:16px;stroke:var(--txt2);fill:none;stroke-width:2;flex-shrink:0}
+.map-search-txt{font-size:14px;color:var(--txt2);font-weight:500}
+.map-cats{display:flex;gap:8px;overflow-x:auto;pointer-events:all}
+.map-cat{flex-shrink:0;background:rgba(8,9,12,.88);border:1px solid var(--border2);border-radius:20px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;backdrop-filter:var(--glass-blur);transition:.2s;display:flex;align-items:center;gap:6px}
+.map-cat.on{border-color:var(--gold);color:#000;background:var(--gold)}
+.map-right{position:absolute;right:14px;z-index:20;display:flex;flex-direction:column;gap:10px}
+.map-ctrl{width:44px;height:44px;border-radius:50%;background:rgba(8,9,12,.9);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:var(--glass-blur);transition:.2s;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.map-ctrl:active{transform:scale(.93)}
+.map-ctrl svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.map-ctrl.locate svg{stroke:var(--blue)}.map-ctrl.ar-c svg{stroke:var(--gold)}
+
+/* Proximity banner (PlaySpot style) */
+.prox-banner{position:absolute;left:14px;right:14px;z-index:30;pointer-events:all;display:none}
+.prox-banner.show{display:block;animation:slideDown .4s cubic-bezier(0.16,1,0.3,1)}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.prox-card{border-radius:20px;padding:14px 16px;display:flex;align-items:center;gap:14px;backdrop-filter:var(--glass-blur);border:1px solid;box-shadow:0 12px 32px rgba(0,0,0,.6)}
+.prox-card.outdoor{background:rgba(8,9,12,.93);border-color:var(--blue)}
+.prox-card.indoor{background:rgba(8,9,12,.93);border-color:var(--gold)}
+.prox-card.food{background:rgba(8,9,12,.93);border-color:var(--local)}
+.prox-ping{position:relative;width:40px;height:40px;flex-shrink:0}
+.prox-icon-el{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;z-index:1}
+.prox-ring{position:absolute;inset:-5px;border-radius:50%;border:1.5px solid;animation:proxRing 1.5s ease-out infinite;opacity:0}
+.prox-ring:nth-child(2){animation-delay:.4s}.prox-ring:nth-child(3){animation-delay:.8s}
+@keyframes proxRing{0%{transform:scale(.7);opacity:.8}100%{transform:scale(2.1);opacity:0}}
+.outdoor .prox-icon-el{background:var(--blue-dim)}.outdoor .prox-ring{border-color:var(--blue)}
+.indoor .prox-icon-el{background:var(--gold-dim)}.indoor .prox-ring{border-color:var(--gold)}
+.food .prox-icon-el{background:var(--local-dim)}.food .prox-ring{border-color:var(--local)}
+.prox-info{flex:1;min-width:0}
+.prox-dist{font-size:11px;font-weight:600;margin-bottom:2px}
+.outdoor .prox-dist{color:var(--blue)}.indoor .prox-dist{color:var(--gold)}.food .prox-dist{color:var(--local)}
+.prox-name{font-size:15px;font-weight:700;color:var(--txt1);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prox-sub{font-size:11px;color:var(--txt3)}
+.prox-action{flex-shrink:0;border:1px solid;border-radius:var(--rs);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;background:none;transition:.2s}
+.outdoor .prox-action{border-color:var(--blue);color:var(--blue)}
+.indoor .prox-action{border-color:var(--gold);color:var(--gold)}
+.food .prox-action{border-color:var(--local);color:var(--local)}
+
+/* Map drawer (PlaySpot style) */
+.drawer{position:absolute;left:12px;right:12px;bottom:110px;z-index:25;background:rgba(8,9,12,.96);border-radius:20px;border:1px solid var(--border2);backdrop-filter:var(--glass-blur);transition:height .4s cubic-bezier(0.16,1,0.3,1);height:88px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.drawer.half{height:60%}
+.drawer-drag{padding:10px 0 2px;display:flex;justify-content:center;cursor:pointer;flex-shrink:0}
+@keyframes handlePulse{0%,100%{opacity:.45;width:36px}50%{opacity:.9;width:48px}}
+.drawer-handle{height:4px;background:var(--txt2);border-radius:3px;animation:handlePulse 2.4s ease-in-out infinite}
+.drawer-peek-row{display:flex;align-items:center;justify-content:space-between;padding:5px 18px 10px;flex-shrink:0}
+.drawer-peek-title{font-size:13px;font-weight:700;letter-spacing:.03em;color:var(--txt1);display:flex;align-items:center;gap:7px}
+.drawer-peek-title::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 6px var(--gold)}
+.drawer-count{font-size:13px;font-weight:600;color:var(--gold)}
+.drawer-hint{font-size:11px;color:var(--txt2);display:flex;align-items:center;gap:3px;font-weight:600;background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;padding:4px 10px}
+.drawer-list{overflow-y:auto;flex:1;padding:0 12px 16px}
+.dspot{display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--rs);margin-bottom:8px;cursor:pointer;transition:.2s}
+.dspot:active{background:var(--bg-surface-hover);transform:scale(.98)}
+.dspot.near{border-color:var(--gold-border);background:var(--gold-dim)}
+.dspot-icon{width:44px;height:44px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid}
+.dspot-icon.outdoor{background:var(--blue-dim);border-color:rgba(74,158,255,.2)}
+.dspot-icon.indoor{background:var(--gold-dim);border-color:var(--gold-border)}
+.dspot-icon.food{background:var(--local-dim);border-color:rgba(61,203,127,.2)}
+.dspot-mid{flex:1;min-width:0}
+.dspot-name{font-size:15px;font-weight:700;color:var(--txt1);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dspot-sub{font-size:11px;color:var(--txt2)}
+.dspot-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.dspot-dist{font-size:11px;font-weight:500;color:var(--txt2)}
+.dspot-pts{font-size:12px;font-weight:700}
+
+/* ── RANK ── */
+#view-rank{padding:22px 20px var(--tab-h)}
+.lb-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--txt1);margin-bottom:5px}
+.lb-sub{font-size:13px;color:var(--txt2);margin-bottom:22px}
+.lb-filter-row{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto}
+.lb-filter{flex-shrink:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:24px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.2s}
+.lb-filter.on{background:var(--txt1);color:#000;border-color:var(--txt1)}
+.my-rank-card{background:linear-gradient(135deg,var(--gold-dim) 0%,rgba(0,0,0,0) 100%);border:1px solid var(--gold-border);border-radius:24px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;box-shadow:0 8px 32px var(--gold-glow)}
+.my-rank-num{font-size:32px;font-weight:800;color:var(--gold);min-width:40px}
+.my-rank-ava{width:48px;height:48px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#000;flex-shrink:0}
+.my-rank-info{flex:1}
+.my-rank-name{font-size:15px;font-weight:700;color:var(--txt1);margin-bottom:4px}
+.my-rank-pts{font-size:13px;font-weight:500;color:var(--gold);font-variant-numeric:tabular-nums}
+.my-rank-badge{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:4px 10px;border-radius:6px}
+.share-strip{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.share-text{flex:1;font-size:12px;color:var(--txt2);line-height:1.5}
+.share-text strong{color:var(--txt1);display:block;margin-bottom:2px;font-size:13px}
+.share-btn{flex-shrink:0;background:linear-gradient(135deg,var(--gem1),var(--gem2));border:none;border-radius:var(--rs);padding:9px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap}
+.lb-list{display:flex;flex-direction:column;gap:10px}
+.lb-row{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;transition:.2s}
+.lb-row.top{border-color:var(--gold-border)}
+.lb-row.me{background:var(--gold-dim);border-left:3px solid var(--gold)}
+.lb-medal{font-size:18px;min-width:24px;text-align:center}
+.lb-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.lb-info{flex:1}
+.lb-name{font-size:14px;font-weight:600;color:var(--txt1);margin-bottom:1px}
+.lb-city{font-size:10px;color:var(--txt3)}
+.lb-score{font-size:13px;font-weight:600;color:var(--txt2);font-variant-numeric:tabular-nums}
+.lb-row.top .lb-score{color:var(--gold)}
+
+/* ── WALLET ── */
+#view-wallet{padding:22px 20px var(--tab-h)}
+.rw-title{font-family:'Playfair Display',serif;font-size:28px;color:var(--txt1);margin-bottom:5px}
+.rw-sub{font-size:13px;color:var(--txt2);margin-bottom:22px}
+.pass-active{background:linear-gradient(135deg,var(--gold-dim) 0%,rgba(0,0,0,0) 100%);border:1px solid var(--gold-border);border-radius:28px;padding:20px;margin-bottom:4px;flex-shrink:0;box-shadow:inset -1px -1px 60px rgba(201,168,76,.06),0 8px 32px var(--gold-glow)}
+.pa-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pa-badge{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#000;padding:5px 12px;border-radius:20px;white-space:nowrap}
+.pa-exp{font-size:11px;font-weight:600;color:rgba(201,168,76,.75);white-space:nowrap}
+.pa-name{font-family:'Playfair Display',serif;font-size:20px;color:#fff;margin-bottom:4px}
+.pa-sub{font-size:13px;color:var(--txt2);margin-bottom:16px}
+.pa-stats{display:flex;gap:24px}
+.pa-sv{font-size:20px;font-weight:700;color:var(--gold);margin-bottom:2px;font-variant-numeric:tabular-nums}
+.pa-sl{font-size:10px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.06em}
+.rw-sec{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--txt2);margin-bottom:12px;margin-top:20px}
+.coupon{background:var(--bg-surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px 16px 20px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px;flex-shrink:0;border-left-width:4px;border-left-style:solid}
+.coupon::before{display:none}
+.coupon.fc{border-left-color:var(--local)}.coupon.cc{border-left-color:var(--gold)}.coupon.qc{border-left-color:var(--gal2)}
+.coupon-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.coupon-from{font-size:12px;font-weight:600;color:var(--txt1);display:flex;align-items:center;gap:5px}
+.coupon-tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.07);color:var(--txt2);flex-shrink:0}
+.coupon-name{font-family:'Playfair Display',serif;font-size:15px;color:#fff;line-height:1.4}
+.coupon-btn{background:none;border:1px solid var(--border2);border-radius:var(--rs);padding:9px 14px;font-size:12px;font-weight:600;color:var(--txt2);cursor:pointer;width:fit-content;transition:.2s}
+.coupon-btn:active{background:var(--bg-surface)}
+.wallet-empty{border:1.5px dashed var(--border2);border-radius:24px;padding:30px;text-align:center;margin-bottom:14px;background:var(--bg-surface)}
+.we-icon{font-size:32px;opacity:.3;margin-bottom:10px}
+.we-title{font-size:14px;font-weight:600;color:var(--txt2);margin-bottom:5px}
+.we-sub{font-size:12px;color:var(--txt3);line-height:1.6;margin-bottom:16px}
+
+/* ── MUSEUM ── */
+#view-museum{padding:0}
+.museum-hero{position:relative;height:158px;flex-shrink:0;overflow:hidden}
+.museum-hero img{width:100%;height:100%;object-fit:cover;opacity:.42}
+.museum-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 15%,var(--bg-base) 100%)}
+.museum-hero-info{position:absolute;bottom:0;left:0;right:0;padding:14px 20px}
+.museum-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:linear-gradient(90deg,var(--gal1),var(--gal2));color:#fff;padding:3px 9px;border-radius:5px;margin-bottom:5px}
+.museum-title{font-family:'Playfair Display',serif;font-size:22px;color:#fff}
+.museum-sub{font-size:10px;color:rgba(255,255,255,.42);margin-top:2px}
+.museum-scan-cta{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--gal1),var(--gal2));border:none;border-radius:var(--r);padding:14px 16px;margin:12px 18px;width:calc(100% - 36px);cursor:pointer;transition:.2s}
+.museum-scan-cta:active{opacity:.85}
+.museum-scan-cta-ico{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.msc-text{text-align:left;flex:1}
+.msc-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.msc-sub{font-size:11px;color:rgba(255,255,255,.6)}
+.artwork-list{padding:0 18px 20px}
+.artwork-room{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gal2);border-left:2px solid var(--gal2);padding-left:9px;margin:16px 0 12px}
+.artwork-item{display:flex;align-items:center;gap:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:9px;cursor:pointer;transition:.2s}
+.artwork-item:active{background:var(--bg-surface-hover);border-color:rgba(196,152,42,.35);transform:scale(.99)}
+.artwork-thumb{width:62px;height:62px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--border)}
+.artwork-thumb img{width:100%;height:100%;object-fit:cover}
+.artwork-info{flex:1}
+.artwork-badge-tag{display:inline-flex;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-bottom:4px;background:linear-gradient(90deg,var(--gal1),var(--gal2));color:#fff}
+.artwork-name{font-family:'Playfair Display',serif;font-size:14px;color:var(--txt1);margin-bottom:2px;line-height:1.3}
+.artwork-artist{font-size:11px;color:var(--txt2)}
+.artwork-year{font-family:'DM Mono',monospace;font-size:9px;color:var(--txt3);margin-top:1px}
+
+/* ── SPLASH ── */
+#view-splash{padding:0;justify-content:flex-end}
+.splash-bg{position:absolute;inset:0}
+.splash-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.42) saturate(.75)}
+.splash-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,8,1) 0%,rgba(3,5,8,.55) 40%,rgba(3,5,8,.1) 100%)}
+.splash-content{position:relative;z-index:5;padding:0 22px 46px;flex-shrink:0}
+.splash-eyebrow{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.splash-eyebrow::before{content:'';width:20px;height:1px;background:var(--gold)}
+.splash-title{font-family:'Playfair Display',serif;font-size:36px;color:#fff;line-height:1.18;margin-bottom:12px}
+.splash-title em{color:var(--gold);font-style:normal}
+.splash-sub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:26px}
+.splash-cities{display:flex;gap:6px;margin-bottom:26px;overflow-x:auto}
+.splash-pill{flex-shrink:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.11);border-radius:20px;padding:7px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:5px}
+.splash-btns{display:flex;flex-direction:column;gap:10px}
+
+/* ── SPOT DETAIL SHEET ── */
+.ss-img{position:relative;height:180px;margin:8px 16px 0;border-radius:22px;overflow:hidden;flex-shrink:0}
+.ss-img img{width:100%;height:100%;object-fit:cover}
+.ss-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,8,.96) 0%,rgba(3,5,8,.15) 60%,transparent 100%)}
+.ss-img-close{position:absolute;top:12px;right:12px;width:32px;height:32px;background:rgba(0,0,0,.65);border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;backdrop-filter:blur(8px)}
+.ss-img-close svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.5}
+.ss-img-info{position:absolute;bottom:0;left:0;right:0;padding:16px}
+.ss-type-badge{font-size:10px;font-weight:700;letter-spacing:.1em;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:6px}
+.ss-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2}
+.ss-stats{display:flex;gap:10px;margin-bottom:16px}
+.ss-stat{flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.ss-stat-val{font-size:16px;font-weight:700;color:var(--txt1);margin-bottom:2px}
+.ss-stat-lbl{font-size:10px;color:var(--txt3);font-weight:600;text-transform:uppercase}
+.ss-desc{font-size:14px;color:var(--txt2);line-height:1.6;margin-bottom:18px}
+.trig-box{border-radius:var(--rs);padding:16px;display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.trig-icon{font-size:22px;flex-shrink:0}
+.trig-title{font-size:14px;font-weight:700;margin-bottom:5px}
+.trig-desc{font-size:12px;color:var(--txt2);line-height:1.5}
+.trig-steps{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.trig-step{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--txt2)}
+.trig-n{width:18px;height:18px;border-radius:50%;border:1px solid var(--txt3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--txt2);flex-shrink:0;margin-top:1px}
+
+/* Audio in sheet */
+.audio-bar{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.audio-bar-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.audio-bar-icon{width:38px;height:38px;border-radius:var(--rs);background:linear-gradient(135deg,var(--gem1),var(--gem2));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.audio-bar-icon svg{width:18px;height:18px;stroke:rgba(255,255,255,.9);fill:none;stroke-width:2}
+.audio-bar-title{flex:1;font-size:13px;font-weight:600;color:var(--txt1)}
+.audio-bar-len{font-family:'DM Mono',monospace;font-size:11px;color:var(--txt3)}
+.audio-prog{height:3px;background:var(--bg-surface-hover);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.audio-prog-fill{height:100%;background:linear-gradient(90deg,var(--gem1),var(--gem2));width:0%;border-radius:2px}
+.audio-btns{display:flex;align-items:center;justify-content:center;gap:20px}
+.a-btn{background:none;border:none;cursor:pointer;color:var(--txt2);width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.a-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.a-play{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--gem1),var(--gem2));display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(155,114,203,.4)}
+.a-play svg{width:18px;height:18px;fill:#fff;margin-left:2px}
+.ai-qs{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.ai-qs-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.ai-qs-title svg{width:12px;height:12px;fill:var(--gem2)}
+.ai-q{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--txt2);line-height:1.5;cursor:pointer;transition:.15s}
+.ai-q:last-child{border-bottom:none}
+.ai-q:active{color:var(--txt1)}
+.ai-q-dot{width:5px;height:5px;border-radius:50%;background:var(--gem2);flex-shrink:0;margin-top:5px}
+.lock-banner{background:linear-gradient(135deg,var(--gold-dim),rgba(0,0,0,0));border:1px solid var(--gold-border);border-radius:var(--r);padding:18px;text-align:center;margin-bottom:4px}
+.lb-icon{font-size:28px;margin-bottom:8px}
+.lb-ttl{font-size:14px;font-weight:700;color:var(--txt1);margin-bottom:4px}
+.lb-stl{font-size:12px;color:var(--txt2);margin-bottom:14px;line-height:1.55}
+.ss-ctas{padding:16px 20px 30px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border);background:var(--bg-base)}
+
+/* Artwork analysis sheet */
+.aw-hero{position:relative;height:165px;flex-shrink:0;overflow:hidden;border-radius:20px;margin:10px 18px 0}
+.aw-hero img{width:100%;height:100%;object-fit:cover;filter:brightness(.65)}
+.aw-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(3,5,8,.98) 0%,transparent 60%)}
+.aw-hero-info{position:absolute;bottom:0;left:0;right:0;padding:12px 14px}
+.aw-hero-name{font-family:'Playfair Display',serif;font-size:18px;color:#fff}
+.aw-hero-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.aw-tabs{display:flex;gap:6px;overflow-x:auto;padding:14px 18px 4px}
+.a-tab{flex-shrink:0;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:20px;border:1px solid;cursor:pointer;transition:.2s;white-space:nowrap}
+.a-tab.on{background:linear-gradient(90deg,var(--gal1),var(--gal2));border-color:transparent;color:#fff}
+.a-tab:not(.on){background:var(--bg-surface);border-color:var(--border);color:var(--txt2)}
+.aw-body{padding:14px 18px 30px;overflow-y:auto;flex:1;max-height:calc(100% - 240px)}
+.insight-box{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.insight-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gal2);margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.insight-txt{font-size:13px;color:var(--txt1);line-height:1.72;font-weight:300}
+.meta-chips{display:flex;gap:8px;margin-bottom:12px}
+.meta-chip{flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--rs);padding:9px;text-align:center}
+.meta-chip-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);margin-bottom:2px}
+.meta-chip-val{font-size:12px;font-weight:600;color:var(--txt1)}
+
+/* ── ONBOARDING (PlaySpot style) ── */
+.ob-overlay{position:absolute;inset:0;z-index:80;pointer-events:none}
+.ob-overlay.active{pointer-events:all}
+.ob-dim{position:absolute;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);opacity:0;transition:opacity .3s}
+.ob-dim.show{opacity:1}
+.ob-tip{position:absolute;background:var(--bg-panel);border:1px solid var(--border2);border-radius:24px;padding:20px;max-width:280px;box-shadow:0 16px 48px rgba(0,0,0,.9);opacity:0;transform:translateY(8px);transition:all .4s cubic-bezier(0.16,1,0.3,1)}
+.ob-tip.show{opacity:1;transform:translateY(0)}
+.ob-tip::after{content:'';position:absolute;width:12px;height:12px;background:var(--bg-panel);border:1px solid var(--border2);transform:rotate(45deg)}
+.ob-tip.arrow-down::after{bottom:-7px;left:50%;margin-left:-6px;border-top:none;border-left:none}
+.ob-tip.arrow-up::after{top:-7px;left:50%;margin-left:-6px;border-bottom:none;border-right:none}
+.ob-step{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:7px}
+.ob-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--txt1);margin-bottom:7px}
+.ob-desc{font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:16px}
+.ob-btns{display:flex;gap:10px;align-items:center;justify-content:space-between}
+.ob-skip{font-size:12px;font-weight:600;color:var(--txt3);cursor:pointer;background:none;border:none;padding:6px;white-space:nowrap;flex-shrink:0}
+.ob-next{background:var(--gold);border:none;border-radius:12px;padding:10px 20px;font-size:13px;font-weight:700;color:#000;cursor:pointer;white-space:nowrap;letter-spacing:-.01em}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ━━━ PAYWALL ━━━ -->
+<div class="paywall" id="paywall">
+  <div class="pw-sheet">
+    <button class="pw-close" onclick="closePaywall()"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <span class="pw-emoji">🗺️</span>
+    <div class="pw-title">코츠월드 잠금 해제</div>
+    <div class="pw-sub">12 스팟 · AI 가이드 · AR 퀘스트<br>이번 달 8,200+ 여행자 이용 중</div>
+    <div class="pw-social">🔥 지난 1시간 동안 <strong style="color:var(--gold)">31명</strong>이 패스를 구매했어요</div>
+    <div class="pw-plans">
+      <div class="pw-plan" id="pw-day" onclick="selPlan('day',this)"><div class="pw-plan-price">£7</div><div class="pw-plan-period">24시간</div><div class="pw-plan-label">당일 패스</div></div>
+      <div class="pw-plan pop sel" id="pw-full" onclick="selPlan('full',this)"><div class="pw-plan-price">£12</div><div class="pw-plan-period">풀패스</div><div class="pw-plan-label">무제한 이용</div></div>
+      <div class="pw-plan" id="pw-multi" onclick="selPlan('multi',this)"><div class="pw-plan-price">£29</div><div class="pw-plan-period">3도시 묶음</div><div class="pw-plan-label">20% 할인</div></div>
+    </div>
+    <div class="pw-feats">
+      <div class="pw-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>12개 스팟 전체 AI 오디오 가이드</div>
+      <div class="pw-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>AR 퀘스트 + 리더보드 경쟁</div>
+      <div class="pw-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>스트리트뷰 사전 탐색 무제한</div>
+      <div class="pw-feat"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>오프라인 이용 · 4개 언어 지원</div>
+    </div>
+    <button class="btn-primary" id="pw-cta" onclick="doPurchase()">코츠월드 풀패스 구매 — £12</button>
+    <div class="pw-fine">즉시 활성화 · 숨겨진 요금 없음 · 언제든 취소</div>
+  </div>
+</div>
+
+<!-- ━━━ SIDE MENU ━━━ -->
+<div class="side-menu" id="side-menu">
+  <div class="sm-hdr">
+    <div class="sm-logo">Travel<em>Quest</em></div>
+    <button class="sm-close" onclick="closeSM()"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  </div>
+  <div class="sm-body">
+    <div class="sm-section">언어 · Language</div>
+    <div class="sm-lang-grid">
+      <div class="sm-lang-pill" onclick="setLang(this,'EN')">🇬🇧 EN</div>
+      <div class="sm-lang-pill sel" onclick="setLang(this,'KO')">🇰🇷 한국어</div>
+      <div class="sm-lang-pill" onclick="setLang(this,'JA')">🇯🇵 日本語</div>
+      <div class="sm-lang-pill" onclick="setLang(this,'ZH')">🇨🇳 中文</div>
+    </div>
+    <div class="sm-section">탐험</div>
+    <div class="sm-item" onclick="closeSM();showView('home')"><div class="sm-item-icon" style="background:var(--blue-dim)">🏙</div><div><div class="sm-item-name">코츠월드 익스플로러</div><div class="sm-item-sub">12 스팟 · AR 퀘스트</div></div></div>
+    <div class="sm-item" onclick="closeSM();showView('museum')"><div class="sm-item-icon" style="background:var(--gold-dim)">🎨</div><div><div class="sm-item-name">National Gallery AI</div><div class="sm-item-sub">작품 스캔 · 28개 마스터피스</div></div></div>
+    <div class="sm-item" onclick="closeSM();openPaywall()"><div class="sm-item-icon" style="background:var(--quest-dim)">🗺️</div><div><div class="sm-item-name">도시 패스 구매</div><div class="sm-item-sub">£7부터 · 전 스팟 잠금 해제</div></div></div>
+    <div class="sm-section">출시 예정</div>
+    <div class="sm-item" style="opacity:.4;pointer-events:none"><div class="sm-item-icon" style="background:var(--orange-dim)">🗼</div><div><div class="sm-item-name">파리 익스플로러</div><div class="sm-item-sub">2026년 3분기</div></div></div>
+    <div class="sm-item" style="opacity:.4;pointer-events:none"><div class="sm-item-icon" style="background:var(--blue-dim)">⛩️</div><div><div class="sm-item-name">교토 사원 투어</div><div class="sm-item-sub">2026년 4분기</div></div></div>
+  </div>
+</div>
+
+<!-- ━━━ AR OVERLAY ━━━ -->
+<div class="ar-overlay" id="ar-overlay">
+  <div class="ar-cam-bg" id="ar-cam-bg" style="background-image:url('https://picsum.photos/id/1044/400/820')"></div>
+  <div class="ar-grid"></div>
+  <div class="ar-top">
+    <div class="ar-badge"><div class="ar-live"></div>AR Live · GPS 활성</div>
+    <div class="ar-x" onclick="closeAR()"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+  </div>
+  <div class="ar-finder">
+    <div class="arc tl"></div><div class="arc tr"></div><div class="arc bl"></div><div class="arc br"></div>
+    <div class="ar-sweep"></div>
+  </div>
+  <div class="ar-hint"><div class="ar-hint-pill">카메라를 스팟에 겨냥하세요</div></div>
+  <div class="ar-obj" id="ar-obj">
+    <div class="ar-obj-lbl"><div class="ar-obj-name">건축 양식의 비밀</div><div class="ar-obj-era">1380년 · 코츠월드 라임스톤</div></div>
+    <div class="ar-obj-emoji">💎</div>
+  </div>
+  <div class="ar-result" id="ar-result">
+    <div class="ar-card">
+      <div class="ar-card-hdr">
+        <div class="ar-card-ico">🎯</div>
+        <div><div class="ar-card-type">AR Quest Unlocked</div><div class="ar-card-name">건축 양식의 비밀</div></div>
+      </div>
+      <div class="ar-card-desc">GPS 반경 진입 확인 — AR 퀘스트 오브젝트가 출현했습니다. 미션을 수행하고 +100 PTS를 획득하세요!</div>
+      <button class="btn-primary" onclick="openQuestOverlay()">⚡ 미션 시작하기</button>
+    </div>
+  </div>
+  <button style="position:absolute;bottom:220px;left:50%;transform:translateX(-50%);z-index:8;background:rgba(201,168,76,.14);border:1px solid var(--gold-border);border-radius:30px;padding:11px 22px;font-size:13px;font-weight:600;color:var(--gold);cursor:pointer;backdrop-filter:var(--glass-blur);white-space:nowrap;display:flex;align-items:center;gap:8px" onclick="triggerARObject()">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M10 8l6 4-6 4V8z" fill="currentColor"/></svg>
+    AR 오브젝트 출현 시뮬레이션
+  </button>
+</div>
+
+<!-- ━━━ QUEST OVERLAY ━━━ -->
+<div class="quest-overlay" id="quest-overlay">
+  <div class="q-hero">
+    <img id="qh-img" src="https://picsum.photos/id/1044/800/400" alt="">
+    <div class="q-hero-overlay"></div>
+    <button class="q-hero-back" onclick="closeQuestOverlay()"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg></button>
+    <div class="q-hero-info"><div class="q-hero-loc">📍 Bibury, Cotswolds · 8m</div><div class="q-hero-name" id="q-hero-name">건축 양식의 비밀</div></div>
+  </div>
+  <div class="q-body">
+    <div class="q-prog" id="q-prog"></div>
+    <div class="q-card" id="q-card"></div>
+  </div>
+</div>
+
+<!-- ━━━ ONBOARDING ━━━ -->
+<div class="ob-overlay" id="ob-overlay">
+  <div class="ob-dim" id="ob-dim"></div>
+  <div class="ob-tip" id="ob-tip"></div>
+</div>
+
+<!-- ━━━ HEADER ━━━ -->
+<div class="hdr">
+  <div class="hdr-logo" onclick="goHome()">Travel<em>Quest</em></div>
+  <div class="hdr-right">
+    <div class="hdr-score" id="hdr-score" style="display:none">
+      <div class="hdr-score-val" id="score-val">0</div>
+      <div class="hdr-score-lbl">PTS</div>
+    </div>
+    <div class="hdr-btn" onclick="openSM()"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></div>
+    <div class="hdr-btn" onclick="showView('rank')" style="position:relative">
+      <svg viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      <div class="notif" id="rank-dot" style="display:none"></div>
+    </div>
+    <div class="hdr-btn" onclick="showView('wallet')">
+      <svg viewBox="0 0 24 24"><path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ① SPLASH -->
+  <div class="view active" id="view-splash" style="padding-bottom:0">
+    <div class="splash-bg"><img src="https://picsum.photos/id/1018/600/900" alt=""><div class="splash-overlay"></div></div>
+    <div class="splash-content">
+      <div class="splash-eyebrow">New way to travel</div>
+      <h1 class="splash-title">준비 없이 도착해도<br><em>괜찮습니다.</em></h1>
+      <p class="splash-sub">지도를 열면 검증된 스팟이 펼쳐집니다.<br>퀘스트를 통해 그 여행을 즐겁게 경험하세요.</p>
+      <div class="splash-cities">
+        <div class="splash-pill"><span>🇬🇧</span> Cotswolds</div>
+        <div class="splash-pill"><span>🇬🇧</span> Edinburgh</div>
+        <div class="splash-pill"><span>🇫🇷</span> Paris</div>
+        <div class="splash-pill"><span>🇯🇵</span> Kyoto</div>
+        <div class="splash-pill"><span>+</span> 더보기</div>
+      </div>
+      <div class="splash-btns">
+        <button class="btn-primary" onclick="startApp()">지금 시작하기 →</button>
+        <button class="btn-sec" onclick="startApp()">둘러보기 (무료)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② HOME -->
+  <div class="view" id="view-home">
+    <div class="home-hero">
+      <div class="home-hero-bg"></div>
+      <div class="home-hero-overlay"></div>
+      <div class="home-hero-content">
+        <div class="home-hero-eye">현재 위치 기반</div>
+        <div class="home-hero-title">코츠월드<br>Hidden Quest</div>
+        <div class="home-hero-sub">12개 스팟 · AI 가이드 · 리더보드 경쟁</div>
+      </div>
+    </div>
+    <div class="home-stats">
+      <div class="hstat"><div class="hstat-val">12</div><div class="hstat-lbl">스팟</div></div>
+      <div class="hstat"><div class="hstat-val">3.2km</div><div class="hstat-lbl">총 거리</div></div>
+      <div class="hstat"><div class="hstat-val">2.5h</div><div class="hstat-lbl">예상 시간</div></div>
+      <div class="hstat"><div class="hstat-val">1,850</div><div class="hstat-lbl">최고 점수</div></div>
+    </div>
+    <div class="home-body">
+      <!-- Pass banner -->
+      <div class="pass-banner" onclick="openPaywall()" id="pass-banner">
+        <div class="pb-top"><div class="pb-badge">🗺 코츠월드</div><div><div class="pb-price">£12</div><div class="pb-price-sub">풀패스</div></div></div>
+        <div class="pb-title">모든 스팟을 잠금 해제하세요</div>
+        <div class="pb-desc">AI 오디오 가이드, AR 퀘스트, 리더보드 경쟁을 모두 즐길 수 있습니다. 현재 31명이 이용 중.</div>
+        <div class="pb-feats"><span class="pb-feat">12 스팟</span><span class="pb-feat">AR 퀘스트</span><span class="pb-feat">AI 해설</span><span class="pb-feat">오프라인</span></div>
+        <button class="btn-primary">지금 잠금 해제 →</button>
+      </div>
+
+      <!-- City row -->
+      <div>
+        <div class="sec-hdr"><div class="sec-title">🌍 주변 도시</div><div class="sec-link" onclick="showView('map')">지도 보기</div></div>
+        <div style="height:12px"></div>
+        <div class="city-row">
+          <div class="city-card on" onclick="openCity('cotswolds')"><div class="city-price">£12</div><img class="city-card-img" src="https://picsum.photos/id/1015/300/200" alt=""><div class="city-card-body"><div class="city-card-name">Cotswolds</div><div class="city-card-meta">12 스팟 · 영국</div></div></div>
+          <div class="city-card" onclick="openCity('edinburgh')"><div class="city-price">£10</div><img class="city-card-img" src="https://picsum.photos/id/1031/300/200" alt=""><div class="city-card-body"><div class="city-card-name">Edinburgh</div><div class="city-card-meta">9 스팟 · 영국</div></div></div>
+          <div class="city-card" onclick="openCity('paris')"><div class="city-price">£14</div><img class="city-card-img" src="https://picsum.photos/id/1040/300/200" alt=""><div class="city-card-body"><div class="city-card-name">Paris</div><div class="city-card-meta">15 스팟 · 프랑스</div></div></div>
+          <div class="city-card" onclick="openCity('kyoto')"><div class="city-price">£11</div><img class="city-card-img" src="https://picsum.photos/id/1057/300/200" alt=""><div class="city-card-body"><div class="city-card-name">Kyoto</div><div class="city-card-meta">10 스팟 · 일본</div></div></div>
+        </div>
+      </div>
+
+      <!-- Spot list (scard style) -->
+      <div>
+        <div class="sec-hdr"><div class="sec-title">📍 코츠월드 스팟</div><div class="sec-link" onclick="showView('map')">전체 보기</div></div>
+        <div style="height:12px"></div>
+        <div class="spot-list" id="spot-list"></div>
+      </div>
+
+      <!-- How-to -->
+      <div class="how-strip">
+        <div class="how-title">어떻게 작동하나요</div>
+        <div class="how-steps">
+          <div class="how-step"><div class="how-num">1</div><div><div class="how-text-title">현지 도착, 지도 열기</div><div class="how-text-sub">검증된 스팟이 지도 위에 바로 펼쳐집니다. 사전 준비 불필요.</div></div></div>
+          <div class="how-step"><div class="how-num">2</div><div><div class="how-text-title">스팟 클릭 → AI 사전 경험</div><div class="how-text-sub">스트리트뷰 + AI 오디오로 현장 전에 미리 경험하세요.</div></div></div>
+          <div class="how-step"><div class="how-num">3</div><div><div class="how-text-title">현장 도착 → AR 퀘스트</div><div class="how-text-sub">QR 스캔으로 AR 오브젝트를 소환하고 퀴즈를 풀어 점수를 획득하세요.</div></div></div>
+          <div class="how-step"><div class="how-num">4</div><div><div class="how-text-title">경쟁하고 리워드 받기</div><div class="how-text-sub">다른 여행자와 리더보드에서 경쟁하고 로컬 쿠폰을 획득하세요.</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ MAP -->
+  <div class="view" id="view-map" style="padding:0;overflow:hidden">
+    <div class="map-sim"><div class="map-grid"></div></div>
+    <div class="map-road" style="width:80%;height:2px;top:40%;left:10%"></div>
+    <div class="map-road" style="width:2px;height:60%;top:18%;left:42%"></div>
+    <div class="map-road" style="width:60%;height:2px;top:60%;left:18%"></div>
+    <div class="map-road" style="width:2px;height:40%;top:28%;left:67%"></div>
+    <div class="map-area-lbl" style="top:14%;left:10%">Chipping Campden</div>
+    <div class="map-area-lbl" style="bottom:28%;right:8%">Bourton-on-the-Water</div>
+    <div class="map-pin audio" style="left:27%;top:44%" onclick="openSpotDetail(0)">🎵</div>
+    <div class="map-pin quest near" style="left:52%;top:36%" onclick="openSpotDetail(1)">⚡</div>
+    <div class="map-pin audio" style="left:38%;top:56%" onclick="openSpotDetail(2)">🎵</div>
+    <div class="map-pin quest" style="left:69%;top:50%" onclick="openSpotDetail(3)">🎯</div>
+    <div class="map-pin local" style="left:21%;top:67%" onclick="openSpotDetail(4)">☕</div>
+    <div class="map-pin museum" style="left:73%;top:63%" onclick="showView('museum')">🎨</div>
+    <div class="map-user"></div>
+    <!-- Proximity banner -->
+    <div class="prox-banner show" id="prox-banner" style="top:130px">
+      <div class="prox-card indoor">
+        <div class="prox-ping"><div class="prox-ring"></div><div class="prox-ring"></div><div class="prox-ring"></div><div class="prox-icon-el">⚡</div></div>
+        <div class="prox-info"><div class="prox-dist">8m 이내</div><div class="prox-name">건축 양식의 비밀</div><div class="prox-sub">AR 퀘스트 발견 — QR 스캔 필요</div></div>
+        <button class="prox-action" onclick="openAROverlay()">AR 시작</button>
+      </div>
+    </div>
+    <div class="map-top">
+      <div class="map-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><div class="map-search-txt">코츠월드 스팟 탐색 중...</div></div>
+      <div class="map-cats"><div class="map-cat on">전체</div><div class="map-cat">🎵 오디오</div><div class="map-cat">⚡ 퀘스트</div><div class="map-cat">🎨 미술관</div><div class="map-cat">☕ 로컬</div></div>
+    </div>
+    <div class="map-right" style="top:140px">
+      <div class="map-ctrl locate"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 14a4 4 0 114-4 4 4 0 01-4 4z"/></svg></div>
+      <div class="map-ctrl ar-c" onclick="openAROverlay()"><svg viewBox="0 0 24 24"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></div>
+    </div>
+    <!-- Drawer -->
+    <div class="drawer" id="drawer">
+      <div class="drawer-drag" onclick="toggleDrawer()"><div class="drawer-handle"></div></div>
+      <div class="drawer-peek-row">
+        <div class="drawer-peek-title">주변 스팟</div>
+        <div style="display:flex;align-items:center;gap:8px"><div class="drawer-count">6개</div><div class="drawer-hint">위로 당기기 ↑</div></div>
+      </div>
+      <div class="drawer-list">
+        <div class="dspot near" onclick="openSpotDetail(1)"><div class="dspot-icon indoor">⚡</div><div class="dspot-mid"><div class="dspot-name">건축 양식의 비밀</div><div class="dspot-sub">AR 퀘스트 · 8m</div></div><div class="dspot-right"><div class="dspot-dist">8m</div><div class="dspot-pts" style="color:var(--quest)">+100 PTS</div></div></div>
+        <div class="dspot" onclick="openSpotDetail(0)"><div class="dspot-icon outdoor">🎵</div><div class="dspot-mid"><div class="dspot-name">Arlington Row</div><div class="dspot-sub">AI 오디오 · 300m</div></div><div class="dspot-right"><div class="dspot-dist">300m</div><div class="dspot-pts" style="color:var(--local)">무료</div></div></div>
+        <div class="dspot" onclick="openSpotDetail(2)"><div class="dspot-icon outdoor">🎵</div><div class="dspot-mid"><div class="dspot-name">Rack Isle</div><div class="dspot-sub">AI 오디오 · 520m</div></div><div class="dspot-right"><div class="dspot-dist">520m</div><div class="dspot-pts" style="color:var(--local)">무료</div></div></div>
+        <div class="dspot" onclick="openSpotDetail(3)"><div class="dspot-icon indoor">🎯</div><div class="dspot-mid"><div class="dspot-name">오래된 문양 복원하기</div><div class="dspot-sub">액션 미션 · 800m</div></div><div class="dspot-right"><div class="dspot-dist">800m</div><div class="dspot-pts" style="color:var(--quest)">+150 PTS</div></div></div>
+        <div class="dspot" onclick="openSpotDetail(4)"><div class="dspot-icon food">☕</div><div class="dspot-mid"><div class="dspot-name">Arlington Tea Room</div><div class="dspot-sub">로컬 제휴 · 1.1km</div></div><div class="dspot-right"><div class="dspot-dist">1.1km</div><div class="dspot-pts" style="color:var(--local)">+200 PTS</div></div></div>
+        <div class="dspot" onclick="showView('museum')"><div class="dspot-icon indoor">🎨</div><div class="dspot-mid"><div class="dspot-name">National Gallery</div><div class="dspot-sub">AI 미술관 · 2.3km</div></div><div class="dspot-right"><div class="dspot-dist">2.3km</div><div class="dspot-pts" style="color:var(--gold)">무료 체험</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ④ RANK -->
+  <div class="view" id="view-rank">
+    <div class="lb-title">Live Ranking</div>
+    <div class="lb-sub">코츠월드 · 오늘 기준</div>
+    <div class="my-rank-card">
+      <div class="my-rank-num" id="my-rank-num">4th</div>
+      <div class="my-rank-ava">나</div>
+      <div class="my-rank-info"><div class="my-rank-name">나 (Me)</div><div class="my-rank-pts" id="my-rank-pts">0 PTS</div></div>
+      <div class="my-rank-badge" id="my-rank-badge">+2 상승 가능</div>
+    </div>
+    <div class="share-strip">
+      <div class="share-text"><strong>친구와 함께하면 더 재밌어요!</strong>나의 순위 카드를 공유하고 경쟁을 시작하세요</div>
+      <button class="share-btn">공유하기</button>
+    </div>
+    <div class="lb-filter-row"><div class="lb-filter on">오늘</div><div class="lb-filter">이번 주</div><div class="lb-filter">전체</div><div class="lb-filter">친구</div></div>
+    <div class="lb-list" id="lb-list"></div>
+  </div>
+
+  <!-- ⑤ WALLET -->
+  <div class="view" id="view-wallet">
+    <div class="rw-title">My Wallet</div>
+    <div class="rw-sub">획득한 패스와 리워드</div>
+    <div class="pass-active" id="wl-pass" style="display:none">
+      <div class="pa-top"><div class="pa-badge">✅ Cotswolds Pass</div><div class="pa-exp">2024.12.31 만료</div></div>
+      <div class="pa-name">코츠월드 풀패스</div>
+      <div class="pa-sub">12개 스팟 · AI 가이드 · 무제한 퀘스트</div>
+      <div class="pa-stats"><div><div class="pa-sv" id="wl-spots">0/12</div><div class="pa-sl">방문 스팟</div></div><div><div class="pa-sv" id="wl-pts-stat">0</div><div class="pa-sl">획득 점수</div></div><div><div class="pa-sv" id="wl-rank-stat">#4</div><div class="pa-sl">현재 순위</div></div></div>
+    </div>
+    <div class="wallet-empty" id="wl-empty">
+      <div class="we-icon">🎟</div>
+      <div class="we-title">보유한 패스가 없습니다</div>
+      <div class="we-sub">도시 패스를 구매하면<br>퀘스트와 리워드를 즐길 수 있습니다</div>
+      <button class="btn-primary" style="max-width:200px;margin:0 auto" onclick="openPaywall()">패스 구매하기</button>
+    </div>
+    <div class="rw-sec">쿠폰 & 리워드</div>
+    <div id="wl-coupons"><div style="font-size:12px;color:var(--txt3);text-align:center;padding:14px 0">퀘스트를 완료하면 리워드가 지급됩니다</div></div>
+  </div>
+
+  <!-- ⑥ MUSEUM -->
+  <div class="view" id="view-museum">
+    <div class="museum-hero"><img src="https://picsum.photos/id/1060/800/400" alt=""><div class="museum-hero-overlay"></div><div class="museum-hero-info"><div class="museum-badge">AI Artwork Scanner</div><div class="museum-title">National Gallery</div><div class="museum-sub">Trafalgar Square, London · Room 1–46</div></div></div>
+    <button class="museum-scan-cta" onclick="openArtworkDetail('ng1')">
+      <div class="museum-scan-cta-ico">📷</div>
+      <div class="msc-text"><div class="msc-title">작품 스캔하기</div><div class="msc-sub">카메라로 촬영하면 Gemini가 즉시 분석합니다</div></div>
+      <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,.6)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div class="artwork-list">
+      <div class="artwork-room">Room 2 — Early Flemish</div>
+      <div class="artwork-item" onclick="openArtworkDetail('ng1')"><div class="artwork-thumb"><img src="https://picsum.photos/id/1025/200/200" alt=""></div><div class="artwork-info"><div class="artwork-badge-tag">✨ AI Ready</div><div class="artwork-name">The Arnolfini Portrait</div><div class="artwork-artist">Jan van Eyck</div><div class="artwork-year">1434 · Oil on oak panel</div></div><svg width="14" height="14" fill="none" stroke="var(--txt3)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg></div>
+      <div class="artwork-item" onclick="openArtworkDetail('ng2')"><div class="artwork-thumb"><img src="https://picsum.photos/id/145/200/200" alt=""></div><div class="artwork-info"><div class="artwork-badge-tag">✨ AI Ready</div><div class="artwork-name">Sunflowers</div><div class="artwork-artist">Vincent van Gogh</div><div class="artwork-year">1888 · Oil on canvas</div></div><svg width="14" height="14" fill="none" stroke="var(--txt3)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg></div>
+      <div class="artwork-room" style="margin-top:8px">Room 34 — British Paintings</div>
+      <div class="artwork-item" onclick="openArtworkDetail('ng3')"><div class="artwork-thumb"><img src="https://picsum.photos/id/155/200/200" alt=""></div><div class="artwork-info"><div class="artwork-badge-tag">✨ AI Ready</div><div class="artwork-name">The Fighting Temeraire</div><div class="artwork-artist">J.M.W. Turner</div><div class="artwork-year">1839 · Oil on canvas</div></div><svg width="14" height="14" fill="none" stroke="var(--txt3)" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5l7 7-7 7"/></svg></div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- FLOATING TABBAR -->
+<div class="tabbar" id="tabbar">
+  <button class="tab-btn" id="tab-home" onclick="showView('home')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="tab-label">홈</span></button>
+  <button class="tab-btn" id="tab-map" onclick="showView('map')"><svg viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg><span class="tab-label">지도</span></button>
+  <button class="tab-btn" id="tab-museum" onclick="showView('museum')"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg><span class="tab-label">갤러리</span></button>
+  <button class="tab-btn" id="tab-rank" onclick="showView('rank')"><svg viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg><span class="tab-label">랭킹</span></button>
+  <button class="tab-btn" id="tab-wallet" onclick="showView('wallet')"><svg viewBox="0 0 24 24"><path d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg><span class="tab-label">지갑</span></button>
+</div>
+
+<!-- SPOT DETAIL SHEET -->
+<div class="sheet" id="sheet-spot">
+  <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+  <div class="ss-img" id="ss-img">
+    <img id="ss-img-src" src="" alt="">
+    <div class="ss-img-overlay"></div>
+    <button class="ss-img-close" onclick="closeSheets()"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <div class="ss-img-info"><div class="ss-type-badge" id="ss-type-badge"></div><div class="ss-name" id="ss-name"></div></div>
+  </div>
+  <div class="sheet-scroll">
+    <div style="height:16px"></div>
+    <div class="ss-stats"><div class="ss-stat"><div class="ss-stat-val" id="ss-dist">—</div><div class="ss-stat-lbl">거리</div></div><div class="ss-stat"><div class="ss-stat-val" id="ss-pts">—</div><div class="ss-stat-lbl">점수</div></div><div class="ss-stat"><div class="ss-stat-val" id="ss-time">—</div><div class="ss-stat-lbl">시간</div></div></div>
+    <div class="ss-desc" id="ss-desc"></div>
+    <!-- Trigger box -->
+    <div class="trig-box" id="ss-trig-box">
+      <div class="trig-icon" id="ss-trig-icon"></div>
+      <div><div class="trig-title" id="ss-trig-title"></div><div class="trig-desc" id="ss-trig-desc"></div><div class="trig-steps" id="ss-trig-steps"></div></div>
+    </div>
+    <!-- Audio -->
+    <div class="audio-bar" id="ss-audio">
+      <div class="audio-bar-top"><div class="audio-bar-icon"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 18V5l12-2v13M9 9l12-2"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><div class="audio-bar-title" id="ss-audio-title">AI 오디오 해설</div><div class="audio-bar-len">2:15</div></div>
+      <div class="audio-prog"><div class="audio-prog-fill" id="ss-audio-fill"></div></div>
+      <div class="audio-btns">
+        <button class="a-btn" onclick="skipAudio(-15)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+        <button class="a-play" id="a-play-btn" onclick="toggleAudio()"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+        <button class="a-btn" onclick="skipAudio(15)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2z"/></svg></button>
+      </div>
+    </div>
+    <!-- AI Qs -->
+    <div class="ai-qs" id="ss-ai-qs">
+      <div class="ai-qs-title"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5"/></svg>AI가 생성한 심화 질문</div>
+      <div class="ai-q" id="aq0"><div class="ai-q-dot"></div><span></span></div>
+      <div class="ai-q" id="aq1"><div class="ai-q-dot"></div><span></span></div>
+      <div class="ai-q" id="aq2"><div class="ai-q-dot"></div><span></span></div>
+    </div>
+    <!-- Lock banner -->
+    <div class="lock-banner" id="ss-lock-banner">
+      <div class="lb-icon">🔒</div>
+      <div class="lb-ttl">이 퀘스트는 잠겨 있습니다</div>
+      <div class="lb-stl">코츠월드 패스를 구매하면<br>모든 퀘스트와 AI 가이드를 즐길 수 있습니다</div>
+      <button class="btn-primary" onclick="closeSheets();openPaywall()">£12로 잠금 해제 →</button>
+    </div>
+  </div>
+  <div class="ss-ctas" id="ss-ctas" style="display:none">
+    <button class="btn-primary" onclick="closeSheets();openQuestOverlay()">⚡ 퀘스트 시작</button>
+    <button class="btn-sec" onclick="closeSheets();openAROverlay()">📡 AR로 탐색하기</button>
+  </div>
+</div>
+
+<!-- ARTWORK ANALYSIS SHEET -->
+<div class="sheet" id="sheet-artwork" style="max-height:96%">
+  <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+  <div class="aw-hero"><img id="aw-img" src="" alt=""><div class="aw-hero-overlay"></div><div class="aw-hero-info"><div class="aw-hero-name" id="aw-name"></div><div class="aw-hero-sub" id="aw-sub"></div></div></div>
+  <div class="aw-tabs" id="aw-tabs"></div>
+  <div class="aw-body" id="aw-body"></div>
+</div>
+
+<!-- OVERLAY DIMMER -->
+<div class="overlay" id="overlay" onclick="closeSheets()"></div>
+
+</div><!-- /phone -->
+
+<script>
+/* ════════════════════════════════
+   DATA
+════════════════════════════════ */
+const SPOTS=[
+  {id:0,type:'audio',name:'Arlington Row',sub:'14세기 양모 상점들',dist:'300m',pts:'무료',time:'3분',img:'https://picsum.photos/id/1015/800/500',
+   desc:'허니컬러의 석조 오두막들은 1380년경 수도원의 양모 창고로 지어졌습니다. 코츠월드 라임스톤의 독특한 질감과 급격한 지붕 경사가 14세기 영국 건축의 정수를 보여줍니다.',
+   qs:['지붕 타일은 어떤 재료로 만들어졌을까요?','창문이 이렇게 작은 이유는 무엇일까요?','현재도 실제 주민이 거주하고 있을까요?'],
+   trig:{icon:'🎵',color:'var(--blue-dim)',title:'AI 오디오 + 스트리트뷰',desc:'스팟에 도착하기 전에 AI 해설을 미리 들을 수 있습니다.',steps:['앱에서 오디오 버튼을 탭하세요','스트리트뷰로 미리 현장을 둘러보세요','현장 도착 후 심화 질문을 통해 더 깊이 탐구하세요']},
+   locked:false},
+  {id:1,type:'quest',name:'건축 양식의 비밀',sub:'현장 관찰 퀴즈',dist:'450m',pts:'+100',time:'5분',img:'https://picsum.photos/id/1044/800/500',
+   desc:'아를링턴 로우의 건축물에는 수백 년의 역사가 담겨 있습니다. 주변을 관찰하고 퀴즈를 풀어 100 PTS를 획득하세요.',
+   qs:['이 건물이 지어진 시대에 유리가 귀했던 이유는?','코츠월드 스톤이 노란빛을 띠는 원인은?','중세 양모 산업이 이 마을을 부유하게 만든 과정은?'],
+   trig:{icon:'📍',color:'var(--quest-dim)',title:'GPS 기반 AR 퀘스트',desc:'현장에 도착하면 AR 오브젝트가 출현하고 퀘스트가 시작됩니다.',steps:['스팟 위치로 이동하세요 (450m)','현장 QR 코드를 스캔하면 AR 오브젝트가 출현합니다','퀴즈를 풀고 +100 PTS를 획득하세요']},
+   locked:true},
+  {id:2,type:'audio',name:'Rack Isle',sub:'생태 보호구역',dist:'520m',pts:'무료',time:'3분',img:'https://picsum.photos/id/1038/800/500',
+   desc:'과거 양모를 세척하고 말리던 장소였습니다. 현재는 다양한 수생 식물과 백조가 서식하는 생태 보호구역으로 보존되어 있습니다.',
+   qs:['Rack Isle라는 이름의 유래는?','이 지역 물이 유독 맑은 이유는?','어떤 철새들을 관찰할 수 있을까요?'],
+   trig:{icon:'🎵',color:'var(--blue-dim)',title:'AI 오디오 가이드',desc:'생태 보호구역의 역사와 자연환경을 AI가 해설합니다.',steps:['오디오 버튼을 탭하세요','걷는 동안 AI 해설을 들어보세요','심화 질문으로 더 많이 알아보세요']},
+   locked:false},
+  {id:3,type:'quest',name:'오래된 문양 복원하기',sub:'연타 액션 미션',dist:'800m',pts:'+150',time:'3분',img:'https://picsum.photos/id/1060/800/500',
+   desc:'석조 문양에 이끼가 끼어 있습니다. 버튼을 빠르게 연타하여 이끼를 제거하고 숨겨진 문양을 복원하세요!',
+   qs:['이 문양이 제작된 시기를 추정하는 방법은?','석조물 보존에 가장 위협적인 환경 요소는?','비슷한 문양이 발견되는 다른 지역은?'],
+   trig:{icon:'👆',color:'var(--blue-dim)',title:'연타 액션 퀘스트',desc:'15회 연타로 석조 문양을 복원하는 액션 미션입니다.',steps:['스팟으로 이동하세요 (800m)','화면의 버튼을 빠르게 15번 연타하세요','문양 복원 완료 시 +150 PTS 획득']},
+   locked:true},
+  {id:4,type:'local',name:'Arlington Tea Room',sub:'로컬 제휴 이벤트',dist:'1.1km',pts:'+200',time:'20분',img:'https://picsum.photos/id/1068/800/500',
+   desc:'코츠월드 전통 찻집에서 스콘과 클로티드 크림을 즐겨보세요. 이 스팟을 방문하고 포인트를 획득하세요.',
+   qs:['영국 애프터눈 티의 역사적 기원은?','클로티드 크림이 데본과 콘월에서 다른 이유는?','코츠월드 허니컴 스콘의 특별한 재료는?'],
+   trig:{icon:'☕',color:'var(--local-dim)',title:'로컬 제휴 스팟',desc:'찻집 QR을 스캔하면 무료 스콘 쿠폰이 발급됩니다.',steps:['찻집으로 이동하세요 (1.1km)','매장 QR 코드를 스캔하세요','무료 스콘 쿠폰 + 200 PTS 획득']},
+   locked:true}
+];
+
+const ARTWORKS={
+  ng1:{name:'The Arnolfini Portrait',sub:'Jan van Eyck · 1434 · Oil on oak panel',img:'https://picsum.photos/id/1025/600/700',overview:'플랑드르 유화 기법의 정점을 보여줍니다. 거울에 반사된 두 인물은 Van Eyck의 경이로운 사실주의를 증명하며, 방 안 가득한 상징들은 중세 결혼 의식의 암호문 같은 역할을 합니다.',technique:'오일 글레이징(Oil Glazing) 기법을 겹쳐 도포하여 섬유와 모피의 질감을 극사실적으로 묘사했습니다. 샹들리에의 촛불 하나는 신의 임재를 상징합니다.',context:'이탈리아 상인 조반니 아르놀피니와 그의 아내를 그린 것으로, 당시로는 혁신적인 실내 초상화 형식입니다.',meta:{시대:'15세기 플랑드르',기법:'오일 글레이징',크기:'82.2 × 60 cm'}},
+  ng2:{name:'Sunflowers',sub:'Vincent van Gogh · 1888 · Oil on canvas',img:'https://picsum.photos/id/145/600/700',overview:'Van Gogh의 독특한 임파스토 기법이 선명하게 드러납니다. 두껍게 쌓인 물감 질감은 해바라기의 생동감을 3차원적으로 표현합니다.',technique:'임파스토(Impasto) 기법으로 물감을 두껍게 발라 빛과 그림자를 질감으로 표현했습니다.',context:'아를에서 고갱을 맞이하기 위해 그린 작품으로, Van Gogh는 황색을 "사랑과 우정의 색"으로 표현했습니다.',meta:{시대:'후기 인상주의',기법:'임파스토',크기:'92.1 × 73 cm'}},
+  ng3:{name:'The Fighting Temeraire',sub:'J.M.W. Turner · 1839 · Oil on canvas',img:'https://picsum.photos/id/155/600/700',overview:'터너의 빛 표현이 이 작품의 핵심입니다. 지는 해의 따뜻한 황금빛과 증기선의 차가운 연기가 대비를 이루며 범선 시대의 종말을 시적으로 묘사합니다.',technique:'물과 하늘의 경계를 흐릿하게 처리하는 대기원근법(Atmospheric Perspective)으로 시간의 흐름을 시각화했습니다.',context:'트라팔가르 해전의 영웅 전함 테메레르가 해체를 위해 끌려가는 마지막 항해를 담은 작품입니다.',meta:{시대:'낭만주의',기법:'대기원근법',크기:'90.7 × 121.6 cm'}}
+};
+
+const LB_DATA=[
+  {name:'Sarah K.',city:'Manchester',score:1420,ava:'S',col:'#e8c97a'},
+  {name:'James O.',city:'London',score:980,ava:'J',col:'#9b72cb'},
+  {name:'Emma P.',city:'Seoul',score:760,ava:'E',col:'#4285f4'},
+  {name:'나 (Me)',city:'현재 위치',score:0,ava:'나',col:'#c9a84c',isMe:true},
+  {name:'Carlos M.',city:'Madrid',score:310,ava:'C',col:'#3dcb7f'},
+];
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let myScore=0,hasPurchased=false,spotsVisited=0;
+let audioPlaying=false,audioProgress=0,audioAF=null;
+let tapCount=0,questPhase=0;
+let drawerOpen=false,activeSheet=null;
+let selectedPlan='full';
+let currentAWId='ng1';
+
+/* ════════════════════════════════
+   NAVIGATION
+════════════════════════════════ */
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el=document.getElementById('view-'+id);
+  if(el) el.classList.add('active');
+  const roots=['home','map','museum','rank','wallet'];
+  const tb=document.getElementById('tabbar');
+  if(roots.includes(id)){
+    tb.classList.add('show');
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const btn=document.getElementById('tab-'+id);
+    if(btn) btn.classList.add('active');
+  } else {
+    tb.classList.remove('show');
+  }
+  if(id==='rank') buildLB();
+}
+function goHome(){closeSheets();showView('home')}
+function startApp(){
+  showView('home');
+  document.getElementById('tabbar').classList.add('show');
+  document.getElementById('tab-home').classList.add('active');
+  buildSpotList();
+  buildLB();
+  setTimeout(()=>startOnboarding(),600);
+}
+function openCity(){hasPurchased?showView('home'):openPaywall()}
+
+/* ════════════════════════════════
+   SHEETS
+════════════════════════════════ */
+function openSheet(id){
+  closeSheets();
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById(id).classList.add('show');
+  activeSheet=id;
+}
+function closeSheets(){
+  document.getElementById('overlay').classList.remove('show');
+  document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));
+  stopAudio();activeSheet=null;
+}
+
+/* ════════════════════════════════
+   SIDE MENU
+════════════════════════════════ */
+function openSM(){document.getElementById('side-menu').classList.add('open')}
+function closeSM(){document.getElementById('side-menu').classList.remove('open')}
+function setLang(el){document.querySelectorAll('.sm-lang-pill').forEach(p=>p.classList.remove('sel'));el.classList.add('sel')}
+
+/* ════════════════════════════════
+   SPOT LIST (scard style)
+════════════════════════════════ */
+function buildSpotList(){
+  const c=document.getElementById('spot-list');
+  const typeLabel={audio:'✨ AI 오디오',quest:'⚡ AR 퀘스트',local:'☕ 로컬'};
+  c.innerHTML=SPOTS.map(s=>`
+    <div class="scard" onclick="openSpotDetail(${s.id})">
+      <img class="scard-img" src="${s.img}" alt="">
+      <div class="scard-body">
+        <div class="scard-type ${s.type}">${typeLabel[s.type]}</div>
+        <div class="scard-name">${s.name}</div>
+        <div class="scard-sub">${s.sub} · ${s.dist}</div>
+        <div class="scard-bottom">
+          <div class="scard-pts ${s.type}">${s.pts}</div>
+          <div class="${s.locked&&!hasPurchased?'trigger-tag t-gps':'trigger-tag t-free'}">${s.locked&&!hasPurchased?'🔒 잠김':'✓ 이용 가능'}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════
+   SPOT DETAIL SHEET
+════════════════════════════════ */
+function openSpotDetail(id){
+  const s=SPOTS[id];
+  document.getElementById('ss-img-src').src=s.img;
+  const typeStyle={audio:'background:linear-gradient(90deg,#4285f4,#9b72cb);color:#fff',quest:'background:var(--quest-dim);color:var(--quest)',local:'background:var(--local-dim);color:var(--local)'};
+  const typeLabel={audio:'✨ AI 오디오',quest:'⚡ AR 퀘스트',local:'☕ 로컬 스팟'};
+  const tb=document.getElementById('ss-type-badge');
+  tb.style.cssText=typeStyle[s.type]+';font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:6px';
+  tb.textContent=typeLabel[s.type];
+  document.getElementById('ss-name').textContent=s.name;
+  document.getElementById('ss-dist').textContent=s.dist;
+  document.getElementById('ss-pts').textContent=s.pts;
+  document.getElementById('ss-time').textContent=s.time;
+  document.getElementById('ss-desc').textContent=s.desc;
+  // trig box
+  const t=s.trig;
+  document.getElementById('ss-trig-box').style.background=t.color;
+  document.getElementById('ss-trig-icon').textContent=t.icon;
+  document.getElementById('ss-trig-title').textContent=t.title;
+  document.getElementById('ss-trig-desc').textContent=t.desc;
+  document.getElementById('ss-trig-steps').innerHTML=t.steps.map((st,i)=>`<div class="trig-step"><div class="trig-n">${i+1}</div><div>${st}</div></div>`).join('');
+  // audio title
+  document.getElementById('ss-audio-title').textContent=s.name+' — AI 해설';
+  audioProgress=0;document.getElementById('ss-audio-fill').style.width='0%';
+  // AI questions
+  s.qs.forEach((q,i)=>{const el=document.getElementById('aq'+i);if(el) el.querySelector('span').textContent=q});
+  // lock
+  const isLocked=s.locked&&!hasPurchased;
+  document.getElementById('ss-lock-banner').style.display=isLocked?'block':'none';
+  const ctas=document.getElementById('ss-ctas');
+  if(!isLocked&&s.type!=='audio'){ctas.style.display='flex'}else{ctas.style.display='none'}
+  openSheet('sheet-spot');
+}
+
+/* ════════════════════════════════
+   AUDIO
+════════════════════════════════ */
+function toggleAudio(){
+  audioPlaying=!audioPlaying;
+  const btn=document.getElementById('a-play-btn');
+  if(audioPlaying){
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path fill="#fff" d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+    const start=performance.now();
+    const sp=audioProgress;
+    function frame(t){
+      if(!audioPlaying) return;
+      audioProgress=Math.min(100,sp+(t-start)/1350*100);
+      document.getElementById('ss-audio-fill').style.width=audioProgress+'%';
+      if(audioProgress<100) audioAF=requestAnimationFrame(frame);
+      else stopAudio();
+    }
+    audioAF=requestAnimationFrame(frame);
+  } else {
+    stopAudio();
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg>';
+  }
+}
+function stopAudio(){audioPlaying=false;cancelAnimationFrame(audioAF);const b=document.getElementById('a-play-btn');if(b) b.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#fff"/></svg>'}
+function skipAudio(s){audioProgress=Math.max(0,Math.min(100,audioProgress+(s/135)*100));document.getElementById('ss-audio-fill').style.width=audioProgress+'%'}
+
+/* ════════════════════════════════
+   AR OVERLAY
+════════════════════════════════ */
+function openAROverlay(){document.getElementById('ar-overlay').classList.add('show')}
+function closeAR(){document.getElementById('ar-overlay').classList.remove('show');document.getElementById('ar-obj').classList.remove('show');document.getElementById('ar-result').classList.remove('show')}
+function triggerARObject(){
+  document.getElementById('ar-obj').classList.add('show');
+  setTimeout(()=>document.getElementById('ar-result').classList.add('show'),700);
+}
+
+/* ════════════════════════════════
+   QUEST OVERLAY
+════════════════════════════════ */
+function openQuestOverlay(){questPhase=0;tapCount=0;renderQuest();document.getElementById('quest-overlay').classList.add('show')}
+function closeQuestOverlay(){document.getElementById('quest-overlay').classList.remove('show')}
+
+function renderQuest(){
+  const phases=['퀴즈','액션','스캔','완료'];
+  const dots=document.getElementById('q-prog');
+  dots.innerHTML=phases.map((_,i)=>`<div class="q-dot ${i<questPhase?'done':i===questPhase?'now':''}"></div>`).join('');
+  const card=document.getElementById('q-card');
+  if(questPhase===0){
+    card.innerHTML=`<div class="q-meta"><div class="q-tag quiz">퀴즈</div><div class="q-pts">+100 PTS</div></div>
+    <div class="q-question">앞에 보이는 건물 문 위쪽에 새겨진 연도는 언제인가요?</div>
+    <div class="q-opts">
+      <button class="q-opt" onclick="checkQ(0)">A. 1380년</button>
+      <button class="q-opt" onclick="checkQ(1)">B. 1645년</button>
+      <button class="q-opt" onclick="checkQ(2)">C. 1820년</button>
+      <button class="q-opt" onclick="checkQ(3)">D. 1952년</button>
+    </div>`;
+  } else if(questPhase===1){
+    tapCount=0;
+    card.innerHTML=`<div class="q-meta"><div class="q-tag action">액션</div><div class="q-pts">+80 PTS</div></div>
+    <div class="q-question">석조 문양에 이끼가 끼어 있습니다! 버튼을 빠르게 15번 연타하여 이끼를 제거하세요!</div>
+    <div style="text-align:center">
+      <div class="action-ring"><button class="action-btn" id="tap-btn" onclick="doTap()">🖐</button></div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--txt2);margin-bottom:8px" id="tap-cnt">0 / 15</div>
+      <div class="action-bar-wrap"><div class="action-bar" id="action-fill"></div></div>
+    </div>`;
+  } else if(questPhase===2){
+    card.innerHTML=`<div class="q-meta"><div class="q-tag scan">미술관 스캔</div><div class="q-pts">+50 PTS</div></div>
+    <div class="q-question">National Gallery에서 Sunflowers 작품을 카메라로 스캔하세요.</div>
+    <div class="museum-scan-frame" onclick="completeScan()">
+      <img class="museum-scan-img" src="https://picsum.photos/id/145/300/200" alt="">
+      <div class="museum-scan-overlay">
+        <div class="mc"><div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div></div>
+        <div class="museum-sweep"></div>
+        <div class="museum-scan-lbl">화면 탭 → 스캔 시뮬레이션</div>
+      </div>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gal2);text-align:center;letter-spacing:.06em">Gemini Vision Active</div>`;
+  } else {
+    addScore(230);
+    card.innerHTML=`<div class="q-success">
+      <div class="q-success-emoji">✨</div>
+      <div class="q-success-pts">+230 PTS</div>
+      <div class="q-success-sub">퀘스트 완료! 코츠월드 탐험가</div>
+      <div class="q-reward-pill">🎉 Arlington Tea Room — 스콘 1개 무료 쿠폰 발급!</div>
+      <div class="q-btns">
+        <button class="q-btn" onclick="closeQuestOverlay();showView('rank')">🏆 랭킹</button>
+        <button class="q-btn" onclick="closeQuestOverlay();showView('wallet')">🎟 지갑</button>
+      </div>
+    </div>`;
+    addCoupon();
+    document.getElementById('rank-dot').style.display='block';
+  }
+}
+
+function checkQ(idx){
+  const opts=document.querySelectorAll('.q-opt');
+  opts.forEach(o=>o.style.pointerEvents='none');
+  const CORRECT=1;
+  if(idx===CORRECT){opts[idx].classList.add('ok');setTimeout(()=>{questPhase=1;renderQuest()},700)}
+  else{opts[idx].classList.add('no');setTimeout(()=>{opts[idx].classList.remove('no');opts.forEach(o=>o.style.pointerEvents='')},600)}
+}
+function doTap(){
+  tapCount++;
+  const btn=document.getElementById('tap-btn');
+  if(btn){btn.style.transform='scale(.88)';setTimeout(()=>btn.style.transform='',80)}
+  document.getElementById('tap-cnt').textContent=tapCount+' / 15';
+  document.getElementById('action-fill').style.width=(tapCount/15*100)+'%';
+  if(tapCount>=15){questPhase=2;renderQuest()}
+}
+function completeScan(){questPhase=3;renderQuest()}
+
+/* ════════════════════════════════
+   SCORE & LEADERBOARD
+════════════════════════════════ */
+function addScore(pts){
+  myScore+=pts;spotsVisited++;
+  document.getElementById('score-val').textContent=myScore;
+  document.getElementById('hdr-score').style.display='flex';
+  document.getElementById('my-rank-pts').textContent=myScore+' PTS';
+  document.getElementById('wl-pts-stat').textContent=myScore;
+  document.getElementById('wl-spots').textContent=spotsVisited+'/12';
+  buildLB();
+}
+function buildLB(){
+  const all=[...LB_DATA.filter(r=>!r.isMe),{...LB_DATA.find(r=>r.isMe),score:myScore}].sort((a,b)=>b.score-a.score);
+  const myIdx=all.findIndex(r=>r.isMe);
+  document.getElementById('my-rank-num').textContent=(myIdx+1)+'th';
+  document.getElementById('wl-rank-stat').textContent='#'+(myIdx+1);
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lb-list').innerHTML=all.map((u,i)=>`
+    <div class="lb-row ${u.isMe?'me':''} ${i<3?'top':''}">
+      <div class="lb-medal">${medals[i]||i+1}</div>
+      <div class="lb-ava" style="background:${u.col}">${u.ava}</div>
+      <div class="lb-info"><div class="lb-name">${u.name}</div><div class="lb-city">${u.city}</div></div>
+      <div class="lb-score">${u.score} PTS</div>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════
+   PAYWALL
+════════════════════════════════ */
+function openPaywall(){document.getElementById('paywall').classList.add('show')}
+function closePaywall(){document.getElementById('paywall').classList.remove('show')}
+function selPlan(plan,el){
+  selectedPlan=plan;
+  document.querySelectorAll('.pw-plan').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  const price={day:'£7',full:'£12',multi:'£29'};
+  const label={day:'데이패스',full:'풀패스',multi:'3도시 묶음'};
+  document.getElementById('pw-cta').textContent=`코츠월드 ${label[plan]} 구매 — ${price[plan]}`;
+}
+function doPurchase(){
+  hasPurchased=true;closePaywall();closeSheets();
+  SPOTS.forEach(s=>s.locked=false);
+  document.getElementById('wl-pass').style.display='block';
+  document.getElementById('wl-empty').style.display='none';
+  buildSpotList();
+  document.getElementById('pass-banner').innerHTML='<div style="display:flex;align-items:center;gap:12px"><div style="font-size:28px">✅</div><div><div style="font-size:15px;font-weight:700;color:var(--txt1);margin-bottom:4px">코츠월드 풀패스 활성화!</div><div style="font-size:13px;color:var(--txt2)">12개 스팟 · 모든 퀘스트 이용 가능</div></div></div>';
+}
+
+/* ════════════════════════════════
+   WALLET
+════════════════════════════════ */
+function addCoupon(){
+  const c=document.getElementById('wl-coupons');
+  c.innerHTML=`
+    <div class="coupon fc"><div class="coupon-header"><div class="coupon-from">☕ Arlington Tea Room</div><div class="coupon-tag">로컬 리워드</div></div><div class="coupon-name">갓 구운 스콘 1개 무료 제공</div><button class="coupon-btn" onclick="alert('바코드를 직원에게 보여주세요!')">바코드 열기</button></div>
+    <div class="coupon cc"><div class="coupon-header"><div class="coupon-from">🏆 Travel Quest</div><div class="coupon-tag">랭킹 리워드</div></div><div class="coupon-name">코츠월드 1일 무료 재방문 패스</div><button class="coupon-btn">사용하기</button></div>`;
+  document.getElementById('wl-empty').style.display='none';
+}
+function saveArtNote(id){
+  const aw=ARTWORKS[id];
+  const c=document.getElementById('wl-coupons');
+  if(!c.querySelector('.qc')){
+    c.innerHTML+=`<div class="coupon qc"><div class="coupon-header"><div class="coupon-from">🎨 National Gallery</div><div class="coupon-tag">Art Note</div></div><div class="coupon-name">${aw.name} — 관람 기록</div><button class="coupon-btn">아트 노트 열기</button></div>`;
+    document.getElementById('wl-empty').style.display='none';
+  }
+}
+
+/* ════════════════════════════════
+   ARTWORK ANALYSIS
+════════════════════════════════ */
+function openArtworkDetail(id){
+  currentAWId=id;
+  const aw=ARTWORKS[id];
+  document.getElementById('aw-img').src=aw.img;
+  document.getElementById('aw-name').textContent=aw.name;
+  document.getElementById('aw-sub').textContent=aw.sub;
+  const tabs=['해설','기법','메타데이터'];
+  document.getElementById('aw-tabs').innerHTML=tabs.map((t,i)=>`<div class="a-tab ${i===0?'on':''}" onclick="switchAWTab(${i})">${t}</div>`).join('');
+  renderAWTab(0);
+  openSheet('sheet-artwork');
+}
+function switchAWTab(idx){
+  document.querySelectorAll('.a-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  renderAWTab(idx);
+}
+function renderAWTab(idx){
+  const aw=ARTWORKS[currentAWId];
+  const b=document.getElementById('aw-body');
+  if(idx===0){
+    b.innerHTML=`<div class="insight-box"><div class="insight-lbl">✨ Gemini 시각 분석</div><div class="insight-txt">${aw.overview}</div></div>
+    <button class="btn-primary" style="margin-bottom:10px" onclick="alert('음성 해설 재생 중...')">🔊 음성 해설 듣기</button>
+    <button class="btn-sec" onclick="saveArtNote('${currentAWId}');this.textContent='✅ 지갑에 저장됨';this.disabled=true">🎟 아트 노트 지갑에 저장</button>`;
+  } else if(idx===1){
+    b.innerHTML=`<div class="insight-box"><div class="insight-lbl">🎨 기법 분석</div><div class="insight-txt">${aw.technique}</div></div>
+    <div class="insight-box"><div class="insight-lbl">📚 역사적 맥락</div><div class="insight-txt">${aw.context}</div></div>`;
+  } else {
+    b.innerHTML=`<div class="meta-chips">${Object.entries(aw.meta).map(([k,v])=>`<div class="meta-chip"><div class="meta-chip-lbl">${k}</div><div class="meta-chip-val">${v}</div></div>`).join('')}</div>
+    <div class="insight-box"><div class="insight-lbl">📌 소장 정보</div><div class="insight-txt">영국 내셔널 갤러리 영구 소장품. 무료 관람 가능. 트라팔가 광장, 런던.</div></div>`;
+  }
+}
+
+/* ════════════════════════════════
+   MAP DRAWER
+════════════════════════════════ */
+function toggleDrawer(){
+  drawerOpen=!drawerOpen;
+  document.getElementById('drawer').classList.toggle('half',drawerOpen);
+}
+
+/* ════════════════════════════════
+   ONBOARDING
+════════════════════════════════ */
+const OB_STEPS=[
+  {step:'01 / 04',title:'지도를 열면 바로 시작',desc:'준비 없이 도착해도 괜찮습니다. 현지에서 지도를 열면 검증된 스팟이 바로 펼쳐집니다.',pos:{bottom:'160px',left:'20px',right:'20px'},arrow:'arrow-down'},
+  {step:'02 / 04',title:'AI 사전 경험',desc:'스팟을 클릭하면 스트리트뷰와 AI 오디오로 현장을 미리 경험할 수 있습니다.',pos:{bottom:'160px',left:'20px',right:'20px'},arrow:'arrow-down'},
+  {step:'03 / 04',title:'AR 퀘스트로 경쟁',desc:'현장 도착 후 AR 오브젝트를 소환하고 퀘스트를 완료해 리더보드에서 경쟁하세요.',pos:{bottom:'160px',left:'20px',right:'20px'},arrow:'arrow-down'},
+  {step:'04 / 04',title:'리워드 획득',desc:'퀘스트 완료 시 로컬 제휴 쿠폰과 특별 리워드가 지급됩니다.',pos:{bottom:'160px',left:'20px',right:'20px'},arrow:'arrow-down'},
+];
+let obStep=0;
+function startOnboarding(){
+  document.getElementById('ob-overlay').classList.add('active');
+  document.getElementById('ob-dim').classList.add('show');
+  showObStep(0);
+}
+function showObStep(i){
+  obStep=i;
+  if(i>=OB_STEPS.length){endOnboarding();return}
+  const s=OB_STEPS[i];const tip=document.getElementById('ob-tip');
+  tip.className='ob-tip '+s.arrow;
+  Object.assign(tip.style,{...s.pos});
+  tip.innerHTML=`<div class="ob-step">${s.step}</div><div class="ob-title">${s.title}</div><div class="ob-desc">${s.desc}</div>
+  <div class="ob-btns"><button class="ob-skip" onclick="endOnboarding()">건너뛰기</button><button class="ob-next" onclick="showObStep(${i+1})">${i===OB_STEPS.length-1?'시작하기 →':'다음'}</button></div>`;
+  setTimeout(()=>tip.classList.add('show'),50);
+}
+function endOnboarding(){
+  document.getElementById('ob-overlay').classList.remove('active');
+  document.getElementById('ob-dim').classList.remove('show');
+  document.getElementById('ob-tip').classList.remove('show');
+}
+
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
+buildLB();
+</script>
+</body>
+</html>
