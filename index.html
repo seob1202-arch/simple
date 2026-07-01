@@ -1115,7 +1115,7 @@ body{
       </div>
 
       <div class="q">
-        <div class="q-label">4. 이런 미션들로 가득한 코스라면, 유료로 구매하실 의향이 있나요? <span class="req">*</span></div>
+        <div class="q-label">4. 다른 지역으로도 확장되고, 최소 30개 이상의 다양한 퀘스트를 즐길 수 있다면 유료로 이용하실 의향이 있나요? <span class="req">*</span></div>
         <div class="intent-scale" id="intent">
           <div class="intent-opt" data-v="1" onclick="pickIntent(this)"><span class="emoji">🙅</span><span class="lbl">아니요</span></div>
           <div class="intent-opt" data-v="2" onclick="pickIntent(this)"><span class="emoji">🤔</span><span class="lbl">글쎄요</span></div>
@@ -1124,8 +1124,20 @@ body{
         </div>
       </div>
 
+      <div class="q" id="price-q" style="display:none">
+        <div class="q-label">5. 그렇다면, 하루 이용권 기준 얼마가 적정하다고 생각하시나요? <span class="req">*</span></div>
+        <div class="q-help">부담 없이 지불할 수 있는 금액을 골라주세요</div>
+        <div class="chips" id="price-chips">
+          <div class="chip" data-v="~5000" onclick="pickChip(this,'price')"><span class="chip-emoji">💵</span><span class="chip-name">5,000원 이하</span><span class="chip-check"></span></div>
+          <div class="chip" data-v="5000-9900" onclick="pickChip(this,'price')"><span class="chip-emoji">💶</span><span class="chip-name">5,000 ~ 9,900원</span><span class="chip-check"></span></div>
+          <div class="chip" data-v="9900-14900" onclick="pickChip(this,'price')"><span class="chip-emoji">💷</span><span class="chip-name">9,900 ~ 14,900원</span><span class="chip-check"></span></div>
+          <div class="chip" data-v="14900-19900" onclick="pickChip(this,'price')"><span class="chip-emoji">💰</span><span class="chip-name">14,900 ~ 19,900원</span><span class="chip-check"></span></div>
+          <div class="chip" data-v="19900+" onclick="pickChip(this,'price')"><span class="chip-emoji">💎</span><span class="chip-name">19,900원 이상</span><span class="chip-check"></span></div>
+        </div>
+      </div>
+
       <div class="q">
-        <div class="q-label">5. 한마디 남겨주세요 (선택)</div>
+        <div class="q-label">6. 한마디 남겨주세요 (선택)</div>
         <textarea id="survey-free" placeholder="좋았던 점, 바라는 점 무엇이든 좋아요"></textarea>
       </div>
     </div>
@@ -1210,7 +1222,7 @@ const SPOTS=[
 
 let cur=0;            // 현재 스폿 인덱스
 let map=null, youMarker=null, spotMarkers=[], routeLine=null, walkTimer=null;
-const survey={ joy:0, best:null, worst:null, intent:0, free:'' };
+const survey={ joy:0, best:null, worst:null, intent:0, price:null, free:'' };
 
 // ---- 화면 전환 ----
 function show(id){
@@ -1698,12 +1710,22 @@ function pickChip(el,group){
 function pickIntent(el){
   document.querySelectorAll('#intent .intent-opt').forEach(o=>o.classList.remove('sel'));
   el.classList.add('sel'); survey.intent=+el.dataset.v;
+  // 지불 의향이 있으면(글쎄요/아마도/네) 적정 가격 질문 노출, '아니요'면 숨김
+  const priceQ=document.getElementById('price-q');
+  if(survey.intent>=2){
+    priceQ.style.display='block';
+  }else{
+    priceQ.style.display='none';
+    survey.price=null;
+    document.querySelectorAll('#price-chips .chip').forEach(c=>c.classList.remove('sel'));
+  }
 }
 function submitSurvey(){
   survey.free=document.getElementById('survey-free').value.trim();
   if(!survey.joy){ toast('즐거움 평가를 별점으로 남겨주세요 ⭐'); return; }
   if(!survey.best){ toast('가장 즐거웠던 미션을 골라주세요'); return; }
-  if(!survey.intent){ toast('구매 의향을 선택해주세요'); return; }
+  if(!survey.intent){ toast('유료 이용 의향을 선택해주세요'); return; }
+  if(survey.intent>=2 && !survey.price){ toast('적정 가격을 선택해주세요'); return; }
   console.log('[PlaySpot survey]',survey);
   goEnd();
 }
@@ -1718,11 +1740,12 @@ function submitEmail(){
   document.getElementById('end-done').classList.add('show');
   fireConfetti();
 }
-function restart(){ cur=0; survey.joy=0;survey.best=null;survey.worst=null;survey.intent=0;survey.free='';
+function restart(){ cur=0; survey.joy=0;survey.best=null;survey.worst=null;survey.intent=0;survey.price=null;survey.free='';
   document.querySelectorAll('.chip,.intent-opt,.star').forEach(e=>e.classList.remove('on','sel'));
   document.getElementById('star-label').textContent='';
   document.getElementById('survey-free').value='';
   document.getElementById('email-input').value='';
+  const pq=document.getElementById('price-q'); if(pq)pq.style.display='none';
   goHome();
 }
 
